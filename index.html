@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Runner - Webcam Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Dino Runner - Webcam Edition</h1>
+        
+        <div class="game-container">
+            <div class="game-section">
+                <div id="calibration" class="screen">
+                    <h2>Calibration</h2>
+                    <p>Stand in front of your camera and raise one hand until calibration completes.</p>
+                    <div id="calibration-progress">0%</div>
+                </div>
+                
+                <div id="game" class="screen hidden">
+                    <canvas id="game-canvas" width="800" height="400"></canvas>
+                    <div class="game-info">
+                        <div id="score">Score: 0</div>
+                        <div id="difficulty">Difficulty: Medium</div>
+                        <div id="action">Action: standing</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="webcam-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="pose-canvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <select id="difficulty-select">
+                <option value="0">Easy</option>
+                <option value="1" selected>Medium</option>
+                <option value="2">Hard</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Load TensorFlow.js and the pose detection model -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    
+    <!-- Load game scripts -->
+    <script src="pose-detection.js"></script>
+    <script src="dino-game.js"></script>
+    <script src="main.js"></script>
+</body>
+</html> 

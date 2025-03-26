@@ -1,0 +1,166 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 100%;
+    padding: 10px;
+}
+
+h1 {
+    color: #333;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.screen {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    aspect-ratio: 2/1;
+    background-color: white;
+    border: 2px solid #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hidden {
+    display: none;
+}
+
+#calibration {
+    background-color: #f8f8f8;
+}
+
+#calibration-progress {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #4CAF50;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+    padding: 15px 0;
+    margin-top: 10px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+#webcam-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 4/3;
+    border: 2px solid #333;
+    overflow: hidden;
+    background-color: black;
+    margin-top: 0;
+    align-self: flex-start;
+}
+
+#webcam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+#pose-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button, select {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#start-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#start-btn:hover {
+    background-color: #45a049;
+}
+
+select {
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+/* Game canvas styling */
+#game-canvas {
+    background-color: white;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .game-container {
+        gap: 15px;
+    }
+}
+
+@media (min-width: 1240px) {
+    .container {
+        max-width: 1200px;
+        padding: 20px;
+    }
+    
+    .game-container {
+        flex-direction: row;
+        gap: 20px;
+    }
+    
+    #webcam-container {
+        width: 400px;
+        height: 300px;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 1239px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .screen {
+        aspect-ratio: 3/2;
+    }
+} 
