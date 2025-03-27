@@ -35,9 +35,29 @@ class PoseDetector {
     
     async setup() {
         try {
-            // Access webcam
+            // Show loading indicator
+            document.getElementById('calibration-progress').textContent = "Loading model...";
+            
+            // Load model first before accessing camera
+            const detectorConfig = {
+                modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+                enableSmoothing: true,
+                modelUrl: 'https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4'
+            };
+            this.detector = await poseDetection.createDetector(
+                poseDetection.SupportedModels.MoveNet, 
+                detectorConfig
+            );
+            
+            console.log("Pose detection model loaded");
+            
+            // Then access camera
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: 640, height: 480 },
+                video: { 
+                    width: { ideal: 640, max: 640 },
+                    height: { ideal: 480, max: 480 },
+                    facingMode: 'user'
+                },
                 audio: false
             });
             this.video.srcObject = stream;
@@ -53,17 +73,6 @@ class PoseDetector {
             this.poseCanvas.width = this.video.videoWidth;
             this.poseCanvas.height = this.video.videoHeight;
             
-            // Load the MoveNet model
-            const detectorConfig = {
-                modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-                enableSmoothing: true
-            };
-            this.detector = await poseDetection.createDetector(
-                poseDetection.SupportedModels.MoveNet, 
-                detectorConfig
-            );
-            
-            console.log("Pose detection model loaded");
             return true;
         } catch (error) {
             console.error("Error setting up pose detection:", error);
@@ -89,10 +98,24 @@ class PoseDetector {
     async startDetection(onStateChange) {
         if (!this.detector) return;
         
+        let frameCount = 0;
+        const frameSkip = 2; // Process every 3rd frame on mobile
+        
+        // Detect if mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
         // Show the pose visualization immediately
         document.getElementById('webcam-container').style.display = 'block';
         
         const detect = async () => {
+            frameCount++;
+            
+            // Skip frames on mobile devices
+            if (isMobile && frameCount % frameSkip !== 0) {
+                requestAnimationFrame(detect);
+                return;
+            }
+            
             const pose = await this.detectPose();
             if (pose) {
                 this.drawPose(pose);
