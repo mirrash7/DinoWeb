@@ -24,7 +24,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const deltaTime = timestamp - lastTime;
         lastTime = timestamp;
         
-        // Always update the game with the current pose state, even when game over
+        // Skip frames if running too slow (below 30fps)
+        if (deltaTime > 33 && !game.gameOver) { // 33ms = ~30fps
+            // Adjust game speed to compensate for lag
+            const speedAdjust = Math.min(deltaTime / 16.6, 2); // 16.6ms = 60fps
+            game.tempSpeedAdjust = 1/speedAdjust;
+        } else {
+            game.tempSpeedAdjust = 1;
+        }
+        
+        // Update and draw
         game.update(poseDetector.humanState);
         game.draw();
         
@@ -94,4 +103,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Set the onCalibrationComplete callback
     poseDetector.onCalibrationComplete = startGameWithCountdown;
+
+    // At the beginning of your code
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isLowPowerDevice = isMobile || navigator.hardwareConcurrency <= 4;
+
+    // If low power device, adjust game settings
+    if (isLowPowerDevice) {
+        // Reduce visual effects
+        game.enableClouds = false;
+        game.reducedEffects = true;
+        
+        // Reduce obstacle frequency
+        game.obstacleFrequencyMultiplier = 0.7;
+    }
 }); 
