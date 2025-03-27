@@ -33,11 +33,20 @@ class DinoGame {
         this.gameOver = false;
         this.lastAction = "standing";
         
+        // Performance adjustments
+        this.tempSpeedAdjust = 1;
+        this.enableClouds = true;
+        this.reducedEffects = false;
+        this.obstacleFrequencyMultiplier = 1;
+        
         // Load assets
         this.loadAssets();
     }
     
     async loadAssets() {
+        // Show loading status
+        document.getElementById('loading-status').textContent = "Loading game assets...";
+        
         // Load all game images
         this.dinoRunImgs = [
             await this.loadImage('assets/dino_run1.png'),
@@ -59,6 +68,9 @@ class DinoGame {
         ];
         this.cloudImg = await this.loadImage('assets/cloud.png');
         this.groundImg = await this.loadImage('assets/ground.png');
+        
+        // Hide loading status when done
+        document.getElementById('loading-status').textContent = "";
     }
     
     loadImage(src) {
@@ -202,27 +214,32 @@ class DinoGame {
         // Don't update game elements if game is over
         if (this.gameOver) return;
         
-        // Update game elements
-        this.ground.update();
+        // Apply speed adjustment for performance
+        const effectiveSpeed = this.gameSpeed * this.tempSpeedAdjust;
         
-        // Update clouds
-        this.cloudTimer++;
-        if (this.cloudTimer > 50) {
-            this.clouds.push(new Cloud(this));
-            this.cloudTimer = 0;
-        }
+        // Update ground with adjusted speed
+        this.ground.update(effectiveSpeed);
         
-        for (let i = this.clouds.length - 1; i >= 0; i--) {
-            this.clouds[i].update();
-            if (this.clouds[i].x < -100) {
-                this.clouds.splice(i, 1);
+        // Skip cloud generation on low-power devices
+        if (this.enableClouds) {
+            this.cloudTimer++;
+            if (this.cloudTimer > 50) {
+                this.clouds.push(new Cloud(this));
+                this.cloudTimer = 0;
+            }
+            
+            for (let i = this.clouds.length - 1; i >= 0; i--) {
+                this.clouds[i].update(effectiveSpeed);
+                if (this.clouds[i].x < -100) {
+                    this.clouds.splice(i, 1);
+                }
             }
         }
         
-        // Update obstacles
+        // Update obstacles with adjusted frequency and speed
         this.obstacleTimer++;
         
-        // Adjust obstacle spawn rate based on difficulty
+        // Adjust obstacle spawn rate based on difficulty and device performance
         let spawnThreshold;
         if (this.currentDifficulty === this.DIFFICULTY_EASY) {
             spawnThreshold = 120;
@@ -232,6 +249,9 @@ class DinoGame {
             spawnThreshold = 50;
         }
         
+        // Apply performance multiplier to spawn rate
+        spawnThreshold = spawnThreshold / this.obstacleFrequencyMultiplier;
+        
         if (this.obstacleTimer > spawnThreshold + Math.floor(Math.random() * 50)) {
             // Determine obstacle type
             const typeIdx = Math.floor(Math.random() * 4);
@@ -240,7 +260,7 @@ class DinoGame {
         }
         
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-            this.obstacles[i].update();
+            this.obstacles[i].update(effectiveSpeed);
             
             // Check collision
             if (this.isColliding(this.dino, this.obstacles[i])) {
@@ -280,8 +300,10 @@ class DinoGame {
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.width, this.height);
         
-        // Draw clouds
-        this.clouds.forEach(cloud => cloud.draw());
+        // Draw clouds if enabled
+        if (this.enableClouds) {
+            this.clouds.forEach(cloud => cloud.draw());
+        }
         
         // Draw ground
         this.ground.draw();
@@ -429,8 +451,8 @@ class Obstacle {
         }
     }
     
-    update() {
-        this.x -= this.game.gameSpeed;
+    update(gameSpeed) {
+        this.x -= gameSpeed || this.game.gameSpeed;
         this.rect.x = this.x;
     }
     
@@ -452,8 +474,8 @@ class Cloud {
         this.y = Math.random() * 150 + 50;
     }
     
-    update() {
-        this.x -= this.game.gameSpeed / 2;
+    update(gameSpeed) {
+        this.x -= (gameSpeed || this.game.gameSpeed) / 2;
     }
     
     draw() {
@@ -469,9 +491,9 @@ class Ground {
         this.y = game.GROUND_HEIGHT;
     }
     
-    update() {
-        this.x1 -= this.game.gameSpeed;
-        this.x2 -= this.game.gameSpeed;
+    update(gameSpeed) {
+        this.x1 -= gameSpeed || this.game.gameSpeed;
+        this.x2 -= gameSpeed || this.game.gameSpeed;
         
         if (this.x1 + this.game.width < 0) {
             this.x1 = this.x2 + this.game.width;
