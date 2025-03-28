@@ -20,8 +20,9 @@
                 </div>
                 
                 <div id="game" class="screen hidden">
-                    <canvas id="game-canvas" width="800" height="400"></canvas>
-                    <div class="game-info">
+                    <canvas id="game-canvas"></canvas>
+                    <!-- Game info elements hidden but kept for JS references -->
+                    <div style="display:none">
                         <div id="score">Score: 0</div>
                         <div id="difficulty">Difficulty: Medium</div>
                         <div id="action">Action: standing</div>
@@ -44,11 +45,9 @@
         </div>
     </div>
 
-    <!-- Load TensorFlow.js and the pose detection model -->
+    <!-- Load scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
-    
-    <!-- Load game scripts -->
     <script src="pose-detection.js"></script>
     <script src="dino-game.js"></script>
     <script src="main.js"></script>

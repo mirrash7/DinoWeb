@@ -39,11 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         game.update(poseDetector.humanState);
         game.draw();
         
-        // Update action display even when game is over
-        if (game.gameOver) {
-            document.getElementById('action').textContent = `Action: ${poseDetector.humanState}`;
-        }
-        
         requestAnimationFrame(gameLoop);
     };
     
@@ -117,4 +112,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         game.reducedEffects = true;
         
     }
+
+    // Add this to the beginning of the DOMContentLoaded event handler
+    const resizeGameCanvas = () => {
+        const gameSection = document.querySelector('.game-section');
+        const gameCanvas = document.getElementById('game-canvas');
+        
+        // Set canvas dimensions to match container
+        gameCanvas.width = gameSection.clientWidth;
+        gameCanvas.height = gameSection.clientHeight;
+        
+        // Update game dimensions if game is initialized
+        if (game) {
+            game.width = gameCanvas.width;
+            game.height = gameCanvas.height;
+            game.GROUND_HEIGHT = gameCanvas.height - 50;
+        }
+    };
+
+    // Call on load and window resize
+    resizeGameCanvas();
+    window.addEventListener('resize', resizeGameCanvas);
 }); 
