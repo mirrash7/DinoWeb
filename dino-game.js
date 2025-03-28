@@ -41,6 +41,9 @@ class DinoGame {
         
         // Load assets
         this.loadAssets();
+        
+        // Adjust performance settings based on device capabilities
+        this.adjustPerformanceSettings();
     }
     
     async loadAssets() {
@@ -214,11 +217,8 @@ class DinoGame {
         // Don't update game elements if game is over
         if (this.gameOver) return;
         
-        // Apply speed adjustment for performance
-        const effectiveSpeed = this.gameSpeed * this.tempSpeedAdjust;
-        
-        // Update ground with adjusted speed
-        this.ground.update(effectiveSpeed);
+        // Update ground
+        this.ground.update(this.gameSpeed);
         
         // Skip cloud generation on low-power devices
         if (this.enableClouds) {
@@ -229,7 +229,7 @@ class DinoGame {
             }
             
             for (let i = this.clouds.length - 1; i >= 0; i--) {
-                this.clouds[i].update(effectiveSpeed);
+                this.clouds[i].update(this.gameSpeed);
                 if (this.clouds[i].x < -100) {
                     this.clouds.splice(i, 1);
                 }
@@ -260,7 +260,7 @@ class DinoGame {
         }
         
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-            this.obstacles[i].update(effectiveSpeed);
+            this.obstacles[i].update(this.gameSpeed);
             
             // Check collision
             if (this.isColliding(this.dino, this.obstacles[i])) {
@@ -333,6 +333,23 @@ class DinoGame {
     
     // Game classes
     // These would be defined here or in separate files
+    
+    adjustPerformanceSettings() {
+        // Check if device is likely to have performance issues
+        const isLowPowerDevice = navigator.hardwareConcurrency <= 4 || 
+                                /Intel(R) HD Graphics/.test(navigator.userAgent);
+        
+        if (isLowPowerDevice) {
+            // Reduce visual effects
+            this.enableClouds = false;
+            this.reducedEffects = true;
+            
+            // Reduce obstacle frequency
+            this.obstacleFrequencyMultiplier = 0.7;
+            
+            console.log("Performance mode enabled for low-power device");
+        }
+    }
 }
 
 // Define game classes (Dino, Obstacle, Cloud, Ground)

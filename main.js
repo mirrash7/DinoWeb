@@ -26,11 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Skip frames if running too slow (below 30fps)
         if (deltaTime > 33 && !game.gameOver) { // 33ms = ~30fps
-            // Adjust game speed to compensate for lag
-            const speedAdjust = Math.min(deltaTime / 16.6, 2); // 16.6ms = 60fps
-            game.tempSpeedAdjust = 1/speedAdjust;
+            // Skip cloud generation on slow frames
+            game.enableClouds = false;
         } else {
-            game.tempSpeedAdjust = 1;
+            // Only re-enable clouds if they weren't disabled by performance settings
+            if (!game.reducedEffects) {
+                game.enableClouds = true;
+            }
         }
         
         // Update and draw
