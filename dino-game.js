@@ -39,8 +39,29 @@ class DinoGame {
         this.reducedEffects = false;
         this.obstacleFrequencyMultiplier = 1;
         
+        // Game version
+        this.version = "1.1";
+        
+        // Visual style settings
+        this.colors = {
+            sky: '#f7f7f7',
+            ground: '#e7e7e7',
+            groundLine: '#c7c7c7',
+            scoreText: '#535353',
+            versionText: '#999999',
+            shadow: 'rgba(0, 0, 0, 0.1)',
+            gameOverGradient1: '#8B4513', // SaddleBrown
+            gameOverGradient2: '#DAA520', // GoldenRod
+            gameOverText: '#FFFFFF',      // White
+            gameOverShadow: 'rgba(0, 0, 0, 0.5)',
+            gameOverGlow: 'rgba(255, 215, 0, 0.7)' // Gold glow
+        };
+        
         // Load assets
         this.loadAssets();
+        
+        // Adjust performance settings based on device capabilities
+        this.adjustPerformanceSettings();
     }
     
     async loadAssets() {
@@ -180,7 +201,7 @@ class DinoGame {
         this.obstacleTimer = 0;
         this.cloudTimer = 0;
         
-        // Update display
+        // Update hidden display elements (still needed for game logic)
         document.getElementById('score').textContent = `Score: ${this.score}`;
         document.getElementById('action').textContent = 'Action: standing';
         
@@ -214,11 +235,8 @@ class DinoGame {
         // Don't update game elements if game is over
         if (this.gameOver) return;
         
-        // Apply speed adjustment for performance
-        const effectiveSpeed = this.gameSpeed * this.tempSpeedAdjust;
-        
-        // Update ground with adjusted speed
-        this.ground.update(effectiveSpeed);
+        // Update ground
+        this.ground.update(this.gameSpeed);
         
         // Skip cloud generation on low-power devices
         if (this.enableClouds) {
@@ -229,7 +247,7 @@ class DinoGame {
             }
             
             for (let i = this.clouds.length - 1; i >= 0; i--) {
-                this.clouds[i].update(effectiveSpeed);
+                this.clouds[i].update(this.gameSpeed);
                 if (this.clouds[i].x < -100) {
                     this.clouds.splice(i, 1);
                 }
@@ -260,7 +278,7 @@ class DinoGame {
         }
         
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-            this.obstacles[i].update(effectiveSpeed);
+            this.obstacles[i].update(this.gameSpeed);
             
             // Check collision
             if (this.isColliding(this.dino, this.obstacles[i])) {
@@ -272,9 +290,8 @@ class DinoGame {
             }
         }
         
-        // Increase score and speed
+        // Increase score
         this.score++;
-        document.getElementById('score').textContent = `Score: ${this.score}`;
         
         // Speed increases based on difficulty
         if (this.currentDifficulty === this.DIFFICULTY_EASY) {
@@ -290,37 +307,158 @@ class DinoGame {
                 this.gameSpeed += 1;
             }
         }
-        
-        // Update action display
-        document.getElementById('action').textContent = `Action: ${this.lastAction}`;
     }
     
     draw() {
+        // Clear and draw background gradient
         this.ctx.clearRect(0, 0, this.width, this.height);
-        this.ctx.fillStyle = 'white';
+        
+        // Draw sky
+        this.ctx.fillStyle = this.colors.sky;
         this.ctx.fillRect(0, 0, this.width, this.height);
+        
+        // Draw a subtle horizon line
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, this.GROUND_HEIGHT - 5);
+        this.ctx.lineTo(this.width, this.GROUND_HEIGHT - 5);
+        this.ctx.strokeStyle = this.colors.groundLine;
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
         
         // Draw clouds if enabled
         if (this.enableClouds) {
             this.clouds.forEach(cloud => cloud.draw());
         }
         
-        // Draw ground
+        // Draw ground with a subtle gradient
         this.ground.draw();
         
-        // Draw obstacles
-        this.obstacles.forEach(obstacle => obstacle.draw());
+        // Draw score in top right corner
+        this.ctx.font = 'bold 24px Arial';
+        this.ctx.fillStyle = 'black';
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`Score: ${this.score}`, this.width - 20, 40);
+        this.ctx.textAlign = 'left';
         
-        // Draw dino
+        // Draw obstacles with shadows
+        this.obstacles.forEach(obstacle => {
+            // Draw shadow
+            this.ctx.fillStyle = this.colors.shadow;
+            this.ctx.fillRect(obstacle.x + 5, obstacle.y + obstacle.rect.height - 5, 
+                             obstacle.rect.width, 5);
+            obstacle.draw();
+        });
+        
+        // Draw dino with shadow
+        this.ctx.fillStyle = this.colors.shadow;
+        if (this.dino.isDucking) {
+            this.ctx.fillRect(this.dino.x + 5, this.dino.duckY + 35, 70, 5);
+        } else {
+            this.ctx.fillRect(this.dino.x + 5, this.dino.y + 65, 50, 5);
+        }
         this.dino.draw();
         
-        // Draw game over message
+        // Draw version number and game info on the same line with background
+        // First draw a background rectangle for the info line
+        this.ctx.fillStyle = this.colors.sky;
+        this.ctx.fillRect(0, this.height - 20, this.width, 20);
+        
+        // Add a subtle separator line
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, this.height - 20);
+        this.ctx.lineTo(this.width, this.height - 20);
+        this.ctx.strokeStyle = this.colors.groundLine;
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+        
+        // Now draw the text
+        this.ctx.font = '12px Arial';
+        this.ctx.fillStyle = this.colors.versionText;
+        
+        // Version on left
+        this.ctx.fillText(`v${this.version}`, 10, this.height - 10);
+        
+        // Difficulty and action info (no score here anymore)
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`Difficulty: ${['Easy', 'Medium', 'Hard'][this.currentDifficulty]} | Action: ${this.lastAction}`, 
+                         this.width - 10, this.height - 10);
+        
+        // Reset text alignment
+        this.ctx.textAlign = 'left';
+        
+        // Draw game over message with 3D styling
         if (this.gameOver) {
-            this.ctx.font = '20px Arial';
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillText('Game Over! Press R to restart', this.width / 2 - 150, this.height / 2);
-            this.ctx.fillText('Press D to cycle difficulty', this.width / 2 - 150, this.height / 2 + 30);
-            this.ctx.fillText('Or raise your hand above the red line to restart', this.width / 2 - 200, this.height / 2 + 60);
+            // Darken the entire screen with a semi-transparent overlay
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(0, 0, this.width, this.height);
+            
+            // Create 3D-looking panel with gradient
+            const panelWidth = 480;
+            const panelHeight = 200;
+            const panelX = this.width/2 - panelWidth/2;
+            const panelY = this.height/2 - panelHeight/2;
+            
+            // Create gradient for 3D effect - gold to brown
+            const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX + panelWidth, panelY + panelHeight);
+            gradient.addColorStop(0, this.colors.gameOverGradient2); // GoldenRod at top
+            gradient.addColorStop(1, this.colors.gameOverGradient1); // SaddleBrown at bottom
+            
+            // Draw main panel with rounded corners
+            this.ctx.save();
+            this.roundRect(panelX, panelY, panelWidth, panelHeight, 15);
+            this.ctx.fillStyle = gradient;
+            this.ctx.fill();
+            
+            // Add gold bevel effect
+            this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.7)'; // Gold bevel
+            this.ctx.lineWidth = 2;
+            this.roundRect(panelX + 3, panelY + 3, panelWidth - 6, panelHeight - 6, 12);
+            this.ctx.stroke();
+            
+            // Add shadow
+            this.ctx.shadowColor = this.colors.gameOverShadow;
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowOffsetX = 5;
+            this.ctx.shadowOffsetY = 5;
+            this.roundRect(panelX, panelY, panelWidth, panelHeight, 15);
+            this.ctx.stroke();
+            this.ctx.shadowColor = 'transparent';
+            
+            // Draw "GAME OVER" text with 3D effect - centered
+            this.ctx.textAlign = 'center';
+            this.ctx.font = 'bold 36px Arial';
+            
+            // Text shadow
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillText('GAME OVER', panelX + panelWidth/2 + 2, panelY + 50 + 2);
+            
+            // Main text with gold glow
+            this.ctx.fillStyle = this.colors.gameOverText;
+            this.ctx.shadowColor = this.colors.gameOverGlow;
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowOffsetX = 0;
+            this.ctx.shadowOffsetY = 0;
+            this.ctx.fillText('GAME OVER', panelX + panelWidth/2, panelY + 50);
+            this.ctx.shadowColor = 'transparent';
+            
+            // Draw score with gold glow - centered
+            this.ctx.font = 'bold 24px Arial';
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            this.ctx.shadowColor = this.colors.gameOverGlow;
+            this.ctx.shadowBlur = 10;
+            this.ctx.fillText(`Final Score: ${this.score}`, panelX + panelWidth/2, panelY + 90);
+            this.ctx.shadowColor = 'transparent';
+            
+            // Draw restart instructions - centered
+            this.ctx.font = '18px Arial';
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            this.ctx.fillText('Press R to restart', panelX + panelWidth/2, panelY + 130);
+            this.ctx.fillText('Press D to cycle difficulty', panelX + panelWidth/2, panelY + 160);
+            this.ctx.fillText('Raise your hand above the red line to restart', panelX + panelWidth/2, panelY + 190);
+            
+            // Reset text alignment
+            this.ctx.textAlign = 'left';
+            this.ctx.restore();
         }
     }
     
@@ -333,6 +471,38 @@ class DinoGame {
     
     // Game classes
     // These would be defined here or in separate files
+    
+    adjustPerformanceSettings() {
+        // Check if device is likely to have performance issues
+        const isLowPowerDevice = navigator.hardwareConcurrency <= 4 || 
+                                /Intel(R) HD Graphics/.test(navigator.userAgent);
+        
+        if (isLowPowerDevice) {
+            // Reduce visual effects
+            this.enableClouds = false;
+            this.reducedEffects = true;
+            
+            // Reduce obstacle frequency
+            this.obstacleFrequencyMultiplier = 0.7;
+            
+            console.log("Performance mode enabled for low-power device");
+        }
+    }
+    
+    // Add helper method for drawing rounded rectangles
+    roundRect(x, y, width, height, radius) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + radius, y);
+        this.ctx.lineTo(x + width - radius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.ctx.lineTo(x + width, y + height - radius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.ctx.lineTo(x + radius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.ctx.lineTo(x, y + radius);
+        this.ctx.quadraticCurveTo(x, y, x + radius, y);
+        this.ctx.closePath();
+    }
 }
 
 // Define game classes (Dino, Obstacle, Cloud, Ground)
@@ -505,6 +675,15 @@ class Ground {
     }
     
     draw() {
+        // Draw ground with a subtle gradient
+        const gradient = this.game.ctx.createLinearGradient(0, this.y, 0, this.y + 20);
+        gradient.addColorStop(0, this.game.colors.ground);
+        gradient.addColorStop(1, this.game.colors.groundLine);
+        
+        this.game.ctx.fillStyle = gradient;
+        this.game.ctx.fillRect(0, this.y, this.game.width, 50);
+        
+        // Draw ground texture
         this.game.ctx.drawImage(this.game.groundImg, this.x1, this.y, this.game.width, 20);
         this.game.ctx.drawImage(this.game.groundImg, this.x2, this.y, this.game.width, 20);
     }

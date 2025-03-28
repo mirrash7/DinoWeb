@@ -26,21 +26,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Skip frames if running too slow (below 30fps)
         if (deltaTime > 33 && !game.gameOver) { // 33ms = ~30fps
-            // Adjust game speed to compensate for lag
-            const speedAdjust = Math.min(deltaTime / 16.6, 2); // 16.6ms = 60fps
-            game.tempSpeedAdjust = 1/speedAdjust;
+            // Skip cloud generation on slow frames
+            game.enableClouds = false;
         } else {
-            game.tempSpeedAdjust = 1;
+            // Only re-enable clouds if they weren't disabled by performance settings
+            if (!game.reducedEffects) {
+                game.enableClouds = true;
+            }
         }
         
         // Update and draw
         game.update(poseDetector.humanState);
         game.draw();
-        
-        // Update action display even when game is over
-        if (game.gameOver) {
-            document.getElementById('action').textContent = `Action: ${poseDetector.humanState}`;
-        }
         
         requestAnimationFrame(gameLoop);
     };
@@ -115,4 +112,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         game.reducedEffects = true;
         
     }
+
+    // Add this to the beginning of the DOMContentLoaded event handler
+    const resizeGameCanvas = () => {
+        const gameSection = document.querySelector('.game-section');
+        const gameCanvas = document.getElementById('game-canvas');
+        
+        // Set canvas dimensions to match container
+        gameCanvas.width = gameSection.clientWidth;
+        gameCanvas.height = gameSection.clientHeight;
+        
+        // Update game dimensions if game is initialized
+        if (game) {
+            game.width = gameCanvas.width;
+            game.height = gameCanvas.height;
+            game.GROUND_HEIGHT = gameCanvas.height - 50;
+        }
+    };
+
+    // Call on load and window resize
+    resizeGameCanvas();
+    window.addEventListener('resize', resizeGameCanvas);
 }); 

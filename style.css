@@ -1,130 +1,99 @@
-body {
-    font-family: Arial, sans-serif;
+body, html {
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
 }
 
 .container {
-    max-width: 100%;
-    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 h1 {
-    color: #333;
+    text-align: center;
+    margin: 10px 0;
 }
 
 .game-container {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex: 1;
+    width: 100%;
+    height: calc(100vh - 100px);
+}
+
+.game-section {
+    flex: 3;
+    position: relative;
+    height: 100%;
+}
+
+#webcam-container {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    background-color: #000;
 }
 
 .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 800px;
-    height: auto;
-    aspect-ratio: 2/1;
-    background-color: white;
-    border: 2px solid #333;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
+    background-color: #f7f7f7;
+}
+
+#calibration {
+    text-align: center;
+}
+
+#calibration-progress {
+    font-size: 48px;
+    margin: 20px 0;
+}
+
+#loading-status {
+    margin-top: 10px;
+    color: #666;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+#webcam, #pose-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .hidden {
     display: none;
 }
 
-#calibration {
-    background-color: #f8f8f8;
-}
-
-#calibration-progress {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #4CAF50;
-}
-
 .game-info {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
-    padding: 15px 0;
-    margin-top: 10px;
-    background-color: #f8f8f8;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    flex-wrap: wrap;
-}
-
-#webcam-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    aspect-ratio: 4/3;
-    border: 2px solid #333;
-    overflow: hidden;
-    background-color: black;
-    margin-top: 0;
-    align-self: flex-start;
-}
-
-#webcam {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-}
-
-#pose-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
+    display: none;
 }
 
 .controls {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-button, select {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#start-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#start-btn:hover {
-    background-color: #45a049;
-}
-
-select {
-    background-color: white;
-    border: 1px solid #ccc;
-}
-
-/* Game canvas styling */
-#game-canvas {
-    background-color: white;
+    padding: 10px;
+    text-align: center;
+    background-color: #f0f0f0;
 }
 
 /* Responsive adjustments */

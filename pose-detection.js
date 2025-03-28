@@ -99,7 +99,7 @@ class PoseDetector {
         if (!this.detector) return;
         
         let frameCount = 0;
-        const frameSkip = 2; // Process every 3rd frame on mobile
+        const frameSkip = navigator.hardwareConcurrency <= 4 ? 3 : 2;
         
         // Detect if mobile
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -110,8 +110,8 @@ class PoseDetector {
         const detect = async () => {
             frameCount++;
             
-            // Skip frames on mobile devices
-            if (isMobile && frameCount % frameSkip !== 0) {
+            // Skip frames on all devices, more aggressively on low-end ones
+            if (frameCount % frameSkip !== 0) {
                 requestAnimationFrame(detect);
                 return;
             }
