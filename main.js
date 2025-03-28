@@ -114,7 +114,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         game.enableClouds = false;
         game.reducedEffects = true;
         
-        // Reduce obstacle frequency
-        game.obstacleFrequencyMultiplier = 0.7;
     }
 }); 
