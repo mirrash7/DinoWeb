@@ -31,12 +31,15 @@ class PoseDetector {
         // Jump motion tracking
         this.inJumpMotion = false;
         this.maxJumpHeight = 0;
+        
+        // Add overlay to hide raw webcam feed during loading
+        this.createWebcamOverlay();
     }
     
     async setup() {
         try {
             // Show loading indicator
-            document.getElementById('calibration-progress').textContent = "Loading model...";
+            document.getElementById('loading-status').textContent = "Loading pose detection model...";
             
             // Load model first before accessing camera
             const detectorConfig = {
@@ -50,6 +53,9 @@ class PoseDetector {
             );
             
             console.log("Pose detection model loaded");
+            
+            // Update loading status when model is loaded
+            document.getElementById('loading-status').textContent = "Camera ready - follow the instructions";
             
             // Then access camera
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -76,6 +82,9 @@ class PoseDetector {
             return true;
         } catch (error) {
             console.error("Error setting up pose detection:", error);
+            document.getElementById('loading-status').innerHTML = 
+                "<span style='color: red;'>Error: Could not access camera.</span><br>" +
+                "Please ensure camera permissions are granted and try again.";
             return false;
         }
     }
@@ -133,6 +142,12 @@ class PoseDetector {
                         onStateChange(state);
                     }
                 }
+            }
+            
+            // Remove the overlay after first successful detection
+            if (this.webcamOverlay && pose) {
+                this.webcamOverlay.remove();
+                this.webcamOverlay = null;
             }
             
             requestAnimationFrame(detect);
@@ -383,5 +398,34 @@ class PoseDetector {
     
     average(arr) {
         return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+    
+    createWebcamOverlay() {
+        // Create a black overlay div
+        const overlay = document.createElement('div');
+        overlay.id = 'webcam-overlay';
+        overlay.style.position = 'absolute';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'black';
+        overlay.style.zIndex = '5'; // Between webcam and pose canvas
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        
+        // Add loading text
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Initializing camera...';
+        loadingText.style.color = 'white';
+        loadingText.style.fontFamily = 'Arial, sans-serif';
+        loadingText.style.fontSize = '16px';
+        
+        overlay.appendChild(loadingText);
+        document.getElementById('webcam-container').appendChild(overlay);
+        
+        // Store reference to remove it later
+        this.webcamOverlay = overlay;
     }
 } 

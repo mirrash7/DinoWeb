@@ -13,10 +13,13 @@
         <div class="game-container">
             <div class="game-section">
                 <div id="calibration" class="screen">
-                    <h2>Calibration</h2>
-                    <p>Stand in front of your camera and raise one hand until calibration completes.</p>
-                    <div id="calibration-progress">0%</div>
-                    <div id="loading-status">Loading pose detection model...</div>
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">Calibration</h2>
+                    <div id="calibration-instructions" style="font-size: 24px; font-weight: bold; max-width: 80%; text-align: center; line-height: 1.4;">
+                        <p style="margin-bottom: 10px;"><strong>1. Stand in front of camera</strong></p>
+                        <p><strong>2. Raise hand above head</strong></p>
+                    </div>
+                    <div id="calibration-progress" style="font-size: 72px; font-weight: bold; margin: 30px 0;">0%</div>
+                    <div id="loading-status" style="font-size: 24px; margin-top: 30px; color: #333; font-weight: bold; text-align: center; line-height: 1.5;">Loading pose detection model...</div>
                 </div>
                 
                 <div id="game" class="screen hidden">
@@ -35,14 +38,6 @@
                 <canvas id="pose-canvas"></canvas>
             </div>
         </div>
-        
-        <div class="controls">
-            <select id="difficulty-select">
-                <option value="0">Easy</option>
-                <option value="1" selected>Medium</option>
-                <option value="2">Hard</option>
-            </select>
-        </div>
     </div>
 
     <!-- Load scripts -->
@@ -51,5 +46,6 @@
     <script src="pose-detection.js"></script>
     <script src="dino-game.js"></script>
     <script src="main.js"></script>
+    <script src="user-profile.js"></script>
 </body>
 </html> 
