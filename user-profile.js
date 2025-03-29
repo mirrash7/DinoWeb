@@ -2,7 +2,8 @@ class UserProfileManager {
     constructor() {
         this.profileData = {
             acronym: '',
-            country: ''
+            country: '',
+            difficulty: 1 // Default to Medium (0=Easy, 1=Medium, 2=Hard)
         };
         
         // Country list with flag emojis
@@ -133,6 +134,60 @@ class UserProfileManager {
         countryGroup.appendChild(countryLabel);
         countryGroup.appendChild(countrySelect);
         
+        // Create difficulty selection
+        const difficultyGroup = document.createElement('div');
+        difficultyGroup.style.display = 'flex';
+        difficultyGroup.style.flexDirection = 'column';
+        difficultyGroup.style.gap = '5px';
+        difficultyGroup.style.marginTop = '10px';
+        
+        const difficultyLabel = document.createElement('label');
+        difficultyLabel.textContent = 'Select difficulty:';
+        difficultyLabel.style.fontWeight = 'bold';
+        
+        const difficultyButtons = document.createElement('div');
+        difficultyButtons.style.display = 'flex';
+        difficultyButtons.style.justifyContent = 'space-between';
+        difficultyButtons.style.gap = '10px';
+        
+        // Create the three difficulty buttons
+        const difficulties = ['Easy', 'Medium', 'Hard'];
+        const difficultyBtns = [];
+        
+        difficulties.forEach((diff, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button'; // Important: not submit
+            btn.textContent = diff;
+            btn.dataset.difficulty = index;
+            btn.style.flex = '1';
+            btn.style.padding = '10px';
+            btn.style.border = 'none';
+            btn.style.borderRadius = '5px';
+            btn.style.fontSize = '14px';
+            btn.style.cursor = 'pointer';
+            btn.style.backgroundColor = index === 1 ? '#4CAF50' : '#e0e0e0';
+            btn.style.color = index === 1 ? 'white' : '#333';
+            btn.style.fontWeight = index === 1 ? 'bold' : 'normal';
+            
+            btn.addEventListener('click', () => {
+                // Update selected difficulty
+                this.profileData.difficulty = index;
+                
+                // Update button styles
+                difficultyBtns.forEach((button, i) => {
+                    button.style.backgroundColor = i === index ? '#4CAF50' : '#e0e0e0';
+                    button.style.color = i === index ? 'white' : '#333';
+                    button.style.fontWeight = i === index ? 'bold' : 'normal';
+                });
+            });
+            
+            difficultyBtns.push(btn);
+            difficultyButtons.appendChild(btn);
+        });
+        
+        difficultyGroup.appendChild(difficultyLabel);
+        difficultyGroup.appendChild(difficultyButtons);
+        
         // Create submit button
         const submitButton = document.createElement('button');
         submitButton.type = 'submit';
@@ -148,7 +203,7 @@ class UserProfileManager {
         submitButton.style.marginTop = '10px';
         submitButton.disabled = true;
         
-        // Create loading indicator
+        // Create loading indicator - simplified version
         const loadingIndicator = document.createElement('div');
         loadingIndicator.id = 'profile-loading';
         loadingIndicator.style.textAlign = 'center';
@@ -159,29 +214,12 @@ class UserProfileManager {
         loadingText.textContent = 'Game is loading in the background...';
         loadingText.style.margin = '5px 0';
         
-        const loadingProgress = document.createElement('div');
-        loadingProgress.id = 'loading-progress-bar';
-        loadingProgress.style.width = '100%';
-        loadingProgress.style.height = '10px';
-        loadingProgress.style.backgroundColor = '#f0f0f0';
-        loadingProgress.style.borderRadius = '5px';
-        loadingProgress.style.overflow = 'hidden';
-        loadingProgress.style.marginTop = '5px';
-        
-        const progressFill = document.createElement('div');
-        progressFill.id = 'progress-fill';
-        progressFill.style.width = '0%';
-        progressFill.style.height = '100%';
-        progressFill.style.backgroundColor = '#4CAF50';
-        progressFill.style.transition = 'width 0.3s ease';
-        
-        loadingProgress.appendChild(progressFill);
         loadingIndicator.appendChild(loadingText);
-        loadingIndicator.appendChild(loadingProgress);
         
         // Assemble form
         form.appendChild(acronymGroup);
         form.appendChild(countryGroup);
+        form.appendChild(difficultyGroup);
         form.appendChild(submitButton);
         
         // Assemble form container
@@ -225,6 +263,7 @@ class UserProfileManager {
             // Save profile data
             this.profileData.acronym = acronymInput.value;
             this.profileData.country = countrySelect.value;
+            // difficulty is already saved when buttons are clicked
             
             // Hide profile screen
             document.getElementById('profile-screen').style.display = 'none';
@@ -267,13 +306,6 @@ class UserProfileManager {
         }
         
         return isValid;
-    }
-    
-    updateLoadingProgress(percent) {
-        const progressFill = document.getElementById('progress-fill');
-        if (progressFill) {
-            progressFill.style.width = `${percent}%`;
-        }
     }
 }
 

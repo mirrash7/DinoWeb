@@ -39,7 +39,7 @@ class PoseDetector {
     async setup() {
         try {
             // Show loading indicator
-            document.getElementById('calibration-progress').textContent = "Loading model...";
+            document.getElementById('loading-status').textContent = "Loading pose detection model...";
             
             // Load model first before accessing camera
             const detectorConfig = {
@@ -53,6 +53,9 @@ class PoseDetector {
             );
             
             console.log("Pose detection model loaded");
+            
+            // Update loading status when model is loaded
+            document.getElementById('loading-status').textContent = "Camera ready - follow the instructions";
             
             // Then access camera
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -79,6 +82,9 @@ class PoseDetector {
             return true;
         } catch (error) {
             console.error("Error setting up pose detection:", error);
+            document.getElementById('loading-status').innerHTML = 
+                "<span style='color: red;'>Error: Could not access camera.</span><br>" +
+                "Please ensure camera permissions are granted and try again.";
             return false;
         }
     }

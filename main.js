@@ -18,32 +18,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize game
     const gameCanvas = document.getElementById('game-canvas');
     const game = new DinoGame(gameCanvas);
-    const difficultySelect = document.getElementById('difficulty-select');
-    const controlsDiv = document.querySelector('.controls');
-    
-    // Set difficulty from select (default to medium)
-    game.currentDifficulty = parseInt(difficultySelect.value || "1");
-    
-    // Simulate loading progress for the profile screen
-    let loadingProgress = 0;
-    const loadingInterval = setInterval(() => {
-        loadingProgress += 5;
-        if (loadingProgress > 100) {
-            loadingProgress = 100;
-            clearInterval(loadingInterval);
-        }
-        
-        // Update progress bar
-        if (window.profileManager) {
-            window.profileManager.updateLoadingProgress(loadingProgress);
-        }
-    }, 500);
     
     // Wait for profile completion
     document.addEventListener('profileComplete', async (event) => {
         // Store profile data in game
         game.playerProfile = event.detail;
         console.log('Profile complete:', game.playerProfile);
+        
+        // Set difficulty from profile
+        game.currentDifficulty = event.detail.difficulty;
         
         // Make sure pose detection is ready
         if (!setupSuccess) {
@@ -128,9 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     // Start game loop
                     requestAnimationFrame(gameLoop);
-                    
-                    // Hide controls
-                    controlsDiv.style.display = 'none';
                 }, 500);
             }
         }, 1000);
