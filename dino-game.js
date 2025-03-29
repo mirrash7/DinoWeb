@@ -57,6 +57,12 @@ class DinoGame {
             gameOverGlow: 'rgba(255, 215, 0, 0.7)' // Gold glow
         };
         
+        // Player profile
+        this.playerProfile = {
+            acronym: '---',
+            country: '--'
+        };
+        
         // Load assets
         this.loadAssets();
         
@@ -338,6 +344,11 @@ class DinoGame {
         this.ctx.fillStyle = 'black';
         this.ctx.textAlign = 'right';
         this.ctx.fillText(`Score: ${this.score}`, this.width - 20, 40);
+        
+        // Draw player profile in top left
+        this.ctx.textAlign = 'left';
+        const countryFlag = this.getCountryFlag(this.playerProfile.country);
+        this.ctx.fillText(`${countryFlag} ${this.playerProfile.acronym}`, 20, 40);
         this.ctx.textAlign = 'left';
         
         // Draw obstacles with shadows
@@ -502,6 +513,18 @@ class DinoGame {
         this.ctx.lineTo(x, y + radius);
         this.ctx.quadraticCurveTo(x, y, x + radius, y);
         this.ctx.closePath();
+    }
+    
+    // Add helper method to get country flag emoji
+    getCountryFlag(countryCode) {
+        if (!countryCode || countryCode === '--') return '🏳️';
+        
+        // Convert country code to flag emoji (each letter is converted to a regional indicator symbol emoji)
+        return countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => String.fromCodePoint(char.charCodeAt(0) + 127397))
+            .join('');
     }
 }
 

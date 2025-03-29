@@ -1,22 +1,65 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const difficultySelect = document.getElementById('difficulty-select');
-    const gameCanvas = document.getElementById('game-canvas');
-    const controlsDiv = document.querySelector('.controls');
+    // Hide calibration screen initially
+    document.getElementById('calibration').style.display = 'none';
     
-    // Initialize pose detector
+    // Initialize pose detector in the background
     const poseDetector = new PoseDetector();
-    const setupSuccess = await poseDetector.setup();
+    let setupSuccess = false;
     
-    if (!setupSuccess) {
-        alert("Failed to set up pose detection. Please make sure your camera is connected and you've granted permission.");
-        return;
-    }
+    // Start pose detector setup in the background
+    const setupPromise = poseDetector.setup().then(success => {
+        setupSuccess = success;
+        if (!success) {
+            alert("Failed to set up pose detection. Please make sure your camera is connected and you've granted permission.");
+        }
+        return success;
+    });
     
     // Initialize game
+    const gameCanvas = document.getElementById('game-canvas');
     const game = new DinoGame(gameCanvas);
+    const difficultySelect = document.getElementById('difficulty-select');
+    const controlsDiv = document.querySelector('.controls');
     
     // Set difficulty from select (default to medium)
     game.currentDifficulty = parseInt(difficultySelect.value || "1");
+    
+    // Simulate loading progress for the profile screen
+    let loadingProgress = 0;
+    const loadingInterval = setInterval(() => {
+        loadingProgress += 5;
+        if (loadingProgress > 100) {
+            loadingProgress = 100;
+            clearInterval(loadingInterval);
+        }
+        
+        // Update progress bar
+        if (window.profileManager) {
+            window.profileManager.updateLoadingProgress(loadingProgress);
+        }
+    }, 500);
+    
+    // Wait for profile completion
+    document.addEventListener('profileComplete', async (event) => {
+        // Store profile data in game
+        game.playerProfile = event.detail;
+        console.log('Profile complete:', game.playerProfile);
+        
+        // Make sure pose detection is ready
+        if (!setupSuccess) {
+            // Wait for setup to complete
+            setupSuccess = await setupPromise;
+            if (!setupSuccess) return;
+        }
+        
+        // Set the onCalibrationComplete callback
+        poseDetector.onCalibrationComplete = startGameWithCountdown;
+        
+        // Start pose detection
+        poseDetector.startDetection((state) => {
+            console.log("Pose state changed:", state);
+        });
+    });
     
     // Set up game loop
     let lastTime = 0;
@@ -92,14 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }, 1000);
     };
-    
-    // Start pose detection immediately
-    poseDetector.startDetection((state) => {
-        console.log("Pose state changed:", state);
-    });
-    
-    // Set the onCalibrationComplete callback
-    poseDetector.onCalibrationComplete = startGameWithCountdown;
 
     // At the beginning of your code
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
