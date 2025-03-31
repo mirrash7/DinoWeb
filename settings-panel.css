@@ -1,3 +1,4 @@
+
 /* Settings Panel Styles */
 .settings-panel {
     position: absolute;
@@ -262,3 +263,4 @@ input:checked + .slider:before {
 #settings-toggle:hover {
     background-color: #f0f0f0;
 } 
+
