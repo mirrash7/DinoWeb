@@ -29,11 +29,14 @@ class SettingsPanel {
             soundEnabled: true,
             showFPS: false,
             reducedMotion: false,
-            highContrast: false
+            highContrast: true
         };
         
         this.createPanel();
         this.setupEventListeners();
+        
+        // Apply high contrast immediately
+        this.applySettings();
     }
     
     createPanel() {
@@ -350,12 +353,12 @@ class SettingsPanel {
     }
     
     resetSettings() {
-        // Reset to defaults
+        // Reset to defaults - high contrast is now true by default
         this.settings = {
             soundEnabled: true,
             showFPS: false,
             reducedMotion: false,
-            highContrast: false
+            highContrast: true
         };
         
         // Update UI
@@ -454,4 +457,30 @@ class SettingsPanel {
             this.loadSettings();
         });
     }
-} 
+    
+    forceShow() {
+        this.isVisible = true;
+        this.panel.style.display = 'flex';
+        if (this.game) {
+            this.game.isPaused = true;
+        }
+        console.log("Settings panel forced to show");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // If the settings panel wasn't initialized in main.js, initialize it here
+    if (!window.settingsPanel && window.game) {
+        window.settingsPanel = new SettingsPanel(window.game);
+    }
+    
+    // Add a keyboard shortcut for testing
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.settingsPanel) {
+            window.settingsPanel.toggle();
+        }
+    });
+    
+    // Add a console command for debugging
+    console.log("Settings panel initialized. Press Escape to toggle or use settingsPanel.toggle() in console");
+}); 

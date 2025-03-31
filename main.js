@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gameCanvas = document.getElementById('game-canvas');
     const game = new DinoGame(gameCanvas);
     
-    // Initialize settings panel
-    const settingsPanel = new SettingsPanel(game);
+    // Initialize settings panel and make it globally accessible
+    window.settingsPanel = new SettingsPanel(game);
     
     // Wait for profile completion
     document.addEventListener('profileComplete', async (event) => {
