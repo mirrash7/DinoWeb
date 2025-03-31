@@ -356,7 +356,7 @@ class DinoGame {
         this.ctx.font = 'bold 24px Arial';
         this.ctx.fillStyle = 'black';
         this.ctx.textAlign = 'right';
-        this.ctx.fillText(`Score: ${this.score}`, this.width - 20, 40);
+        this.ctx.fillText(`Score: ${this.score}`, this.width - 60, 40);
         
         // Draw player profile in top left
         this.ctx.textAlign = 'left';
