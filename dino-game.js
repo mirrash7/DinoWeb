@@ -32,6 +32,10 @@ class DinoGame {
         this.cloudTimer = 0;
         this.gameOver = false;
         this.lastAction = "standing";
+        this.isPaused = false;
+        this.showFPS = false;
+        this.lastFrameTime = 0;
+        this.frameRate = 0;
         
         // Performance adjustments
         this.tempSpeedAdjust = 1;
@@ -215,6 +219,9 @@ class DinoGame {
     }
     
     update(action) {
+        // Don't update if paused
+        if (this.isPaused) return;
+        
         // Process pose action even when game is over (for restart detection)
         if (action) {
             // Store the action for display
@@ -316,6 +323,12 @@ class DinoGame {
     }
     
     draw() {
+        // Calculate FPS
+        const now = performance.now();
+        const delta = now - this.lastFrameTime;
+        this.lastFrameTime = now;
+        this.frameRate = Math.round(1000 / delta);
+        
         // Clear and draw background gradient
         this.ctx.clearRect(0, 0, this.width, this.height);
         
@@ -470,6 +483,14 @@ class DinoGame {
             // Reset text alignment
             this.ctx.textAlign = 'left';
             this.ctx.restore();
+        }
+        
+        // Draw FPS counter if enabled
+        if (this.showFPS) {
+            this.ctx.font = '12px Arial';
+            this.ctx.fillStyle = 'black';
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(`FPS: ${this.frameRate}`, 10, 20);
         }
     }
     
