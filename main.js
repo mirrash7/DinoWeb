@@ -24,8 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize settings panel after game is created
     try {
-        window.settingsPanel = new SettingsPanel(game);
-        console.log("Settings panel initialized successfully");
+        // Check if SettingsPanel class exists before trying to use it
+        if (typeof SettingsPanel === 'function') {
+            window.settingsPanel = new SettingsPanel(game);
+            console.log("Settings panel initialized successfully");
+        } else {
+            console.error("SettingsPanel class is not defined. Make sure settings.js is loaded before main.js");
+        }
     } catch (error) {
         console.error("Error initializing settings panel:", error);
     }
