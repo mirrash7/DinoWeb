@@ -19,8 +19,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gameCanvas = document.getElementById('game-canvas');
     const game = new DinoGame(gameCanvas);
     
-    // Initialize settings panel and make it globally accessible
-    window.settingsPanel = new SettingsPanel(game);
+    // Make game globally accessible for settings panel
+    window.game = game;
+    
+    // Initialize settings panel after game is created
+    try {
+        window.settingsPanel = new SettingsPanel(game);
+        console.log("Settings panel initialized successfully");
+    } catch (error) {
+        console.error("Error initializing settings panel:", error);
+    }
     
     // Wait for profile completion
     document.addEventListener('profileComplete', async (event) => {

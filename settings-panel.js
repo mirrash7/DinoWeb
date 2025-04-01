@@ -468,6 +468,8 @@ class SettingsPanel {
     }
 }
 
+// Remove or comment out this entire event listener at the bottom of the file
+/*
 document.addEventListener('DOMContentLoaded', () => {
     // If the settings panel wasn't initialized in main.js, initialize it here
     if (!window.settingsPanel && window.game) {
@@ -483,4 +485,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add a console command for debugging
     console.log("Settings panel initialized. Press Escape to toggle or use settingsPanel.toggle() in console");
-}); 
+});
+*/ 
