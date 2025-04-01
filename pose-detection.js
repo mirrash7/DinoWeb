@@ -79,6 +79,25 @@ class PoseDetector {
             this.poseCanvas.width = this.video.videoWidth;
             this.poseCanvas.height = this.video.videoHeight;
             
+            // Update the webcam overlay text once camera is initialized
+            if (this.webcamOverlay) {
+                const overlayText = document.getElementById('webcam-overlay-text');
+                if (overlayText) {
+                    overlayText.textContent = 'Stand in front of the camera';
+                    overlayText.style.fontSize = '22px';
+                    
+                    // Add a secondary instruction
+                    const secondaryText = document.createElement('div');
+                    secondaryText.textContent = 'Waiting to detect movement...';
+                    secondaryText.style.color = 'rgba(255, 255, 255, 0.8)';
+                    secondaryText.style.fontFamily = 'Arial, sans-serif';
+                    secondaryText.style.fontSize = '16px';
+                    secondaryText.style.marginTop = '10px';
+                    
+                    this.webcamOverlay.appendChild(secondaryText);
+                }
+            }
+            
             return true;
         } catch (error) {
             console.error("Error setting up pose detection:", error);
@@ -115,6 +134,9 @@ class PoseDetector {
         
         // Show the pose visualization immediately
         document.getElementById('webcam-container').style.display = 'block';
+        
+        // Make webcam semi-transparent all the time
+        this.video.style.opacity = '0.7';
         
         const detect = async () => {
             frameCount++;
@@ -292,24 +314,33 @@ class PoseDetector {
     drawPose(pose) {
         this.ctx.clearRect(0, 0, this.poseCanvas.width, this.poseCanvas.height);
         
-        // Set background to black
-        this.ctx.fillStyle = 'black';
+        // Set background to transparent instead of black
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';  // Semi-transparent black
         this.ctx.fillRect(0, 0, this.poseCanvas.width, this.poseCanvas.height);
+        
+        // Save the current context state
+        this.ctx.save();
+        
+        // We need to flip the coordinates for the keypoints since the video is flipped in CSS
+        // but we don't want to flip the drawing itself
         
         // Draw keypoints with special highlight for hands that can trigger restart
         pose.keypoints.forEach(keypoint => {
             if (keypoint.score > 0.5) {
                 this.ctx.beginPath();
                 
+                // Convert x coordinate to account for the CSS flip
+                const flippedX = this.poseCanvas.width - keypoint.x;
+                
                 // Highlight wrists that are above the big jump threshold when game is over
                 if (this.game && this.game.gameOver && 
                     (keypoint.name === 'left_wrist' || keypoint.name === 'right_wrist') && 
                     keypoint.y < this.shoulderBaseline - this.bigJumpThreshold) {
                     // Make the point larger and red to indicate it can trigger restart
-                    this.ctx.arc(keypoint.x, keypoint.y, 8, 0, 2 * Math.PI);
+                    this.ctx.arc(flippedX, keypoint.y, 10, 0, 2 * Math.PI);
                     this.ctx.fillStyle = 'red';
                 } else {
-                    this.ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+                    this.ctx.arc(flippedX, keypoint.y, 6, 0, 2 * Math.PI);
                     this.ctx.fillStyle = 'yellow';
                 }
                 
@@ -317,7 +348,7 @@ class PoseDetector {
             }
         });
         
-        // Draw skeleton
+        // Draw skeleton with thicker lines
         const connections = [
             ['left_shoulder', 'right_shoulder'],
             ['left_shoulder', 'left_elbow'],
@@ -338,60 +369,100 @@ class PoseDetector {
             const point2 = pose.keypoints.find(kp => kp.name === p2);
             
             if (point1 && point2 && point1.score > 0.5 && point2.score > 0.5) {
+                // Convert x coordinates to account for the CSS flip
+                const flippedX1 = this.poseCanvas.width - point1.x;
+                const flippedX2 = this.poseCanvas.width - point2.x;
+                
                 this.ctx.beginPath();
-                this.ctx.moveTo(point1.x, point1.y);
-                this.ctx.lineTo(point2.x, point2.y);
-                this.ctx.lineWidth = 2;
+                this.ctx.moveTo(flippedX1, point1.y);
+                this.ctx.lineTo(flippedX2, point2.y);
+                this.ctx.lineWidth = 3;
                 this.ctx.strokeStyle = 'green';
                 this.ctx.stroke();
             }
         });
         
+        // Restore the context
+        this.ctx.restore();
+        
         // Draw baselines if calibration is complete
         if (!this.isCalibrating && this.shoulderBaseline) {
-            // Draw shoulder baseline
+            // Draw shoulder baseline with thicker lines
             this.ctx.beginPath();
             this.ctx.moveTo(0, this.shoulderBaseline);
             this.ctx.lineTo(this.poseCanvas.width, this.shoulderBaseline);
+            this.ctx.lineWidth = 3;
             this.ctx.strokeStyle = 'green';
             this.ctx.stroke();
             
-            // Draw jump thresholds
+            // Draw jump thresholds with thicker lines
             this.ctx.beginPath();
-            this.ctx.setLineDash([5, 5]);
+            this.ctx.setLineDash([8, 5]);
             this.ctx.moveTo(0, this.shoulderBaseline - this.smallJumpThreshold);
             this.ctx.lineTo(this.poseCanvas.width, this.shoulderBaseline - this.smallJumpThreshold);
+            this.ctx.lineWidth = 3;
             this.ctx.strokeStyle = 'yellow';
             this.ctx.stroke();
             
             this.ctx.beginPath();
             this.ctx.moveTo(0, this.shoulderBaseline - this.bigJumpThreshold);
             this.ctx.lineTo(this.poseCanvas.width, this.shoulderBaseline - this.bigJumpThreshold);
+            this.ctx.lineWidth = 3;
             this.ctx.strokeStyle = 'red';
             this.ctx.stroke();
             
-            // Draw duck threshold - changed to orange
+            // Draw duck threshold with thicker lines
             this.ctx.beginPath();
-            this.ctx.moveTo(0, this.shoulderBaseline - this.duckThreshold); // Note: duckThreshold is negative
+            this.ctx.moveTo(0, this.shoulderBaseline - this.duckThreshold);
             this.ctx.lineTo(this.poseCanvas.width, this.shoulderBaseline - this.duckThreshold);
-            this.ctx.strokeStyle = 'orange'; // Changed from blue to orange
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeStyle = 'orange';
             this.ctx.stroke();
             
             this.ctx.setLineDash([]);
             
-            // Add labels for thresholds
-            this.ctx.font = '12px Arial';
-            this.ctx.fillStyle = 'white';
-            this.ctx.fillText('Standing', 10, this.shoulderBaseline - 5);
-            this.ctx.fillText('Small Jump', 10, this.shoulderBaseline - this.smallJumpThreshold - 5);
-            this.ctx.fillText('Big Jump', 10, this.shoulderBaseline - this.bigJumpThreshold - 5);
-            this.ctx.fillText('Duck', 10, this.shoulderBaseline - this.duckThreshold - 5);
+            // Add labels for thresholds with background for better visibility
+            this.ctx.font = '16px Arial';
             
+            // Function to draw text with background - shifted to the right
+            const drawTextWithBackground = (text, y, textColor = 'white', bgColor = 'rgba(0, 0, 0, 0.7)') => {
+                // Position text on the right side with padding
+                const x = this.poseCanvas.width - 120; // Shifted to right side
+                
+                const metrics = this.ctx.measureText(text);
+                const textWidth = metrics.width;
+                const textHeight = 16; // Approximate height based on font size
+                
+                // Draw background
+                this.ctx.fillStyle = bgColor;
+                this.ctx.fillRect(x - 5, y - textHeight, textWidth + 10, textHeight + 4);
+                
+                // Draw text
+                this.ctx.fillStyle = textColor;
+                this.ctx.fillText(text, x, y);
+            };
+            
+            // Draw labels with backgrounds - shifted to the right
+            drawTextWithBackground('Standing', this.shoulderBaseline - 15);
+            drawTextWithBackground('Small Jump', this.shoulderBaseline - this.smallJumpThreshold - 15);
+            drawTextWithBackground('Big Jump', this.shoulderBaseline - this.bigJumpThreshold -15);
+            drawTextWithBackground('Duck', this.shoulderBaseline - this.duckThreshold - 15);
+
             // Add restart instruction if game is over
             if (this.game && this.game.gameOver) {
-                this.ctx.font = '14px Arial';
+                this.ctx.font = '18px Arial';
+                
+                // Center the restart instruction
+                const restartText = 'Raise hand above red line to restart';
+                const metrics = this.ctx.measureText(restartText);
+                const x = (this.poseCanvas.width - metrics.width) / 2;
+                
+                // Draw with more visible background
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                this.ctx.fillRect(x - 10, 20, metrics.width + 20, 30);
+                
                 this.ctx.fillStyle = 'white';
-                this.ctx.fillText('Raise hand above red line to restart', 10, 30);
+                this.ctx.fillText(restartText, x, 40);
             }
         }
     }
@@ -409,18 +480,21 @@ class PoseDetector {
         overlay.style.left = '0';
         overlay.style.width = '100%';
         overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'black';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
         overlay.style.zIndex = '5'; // Between webcam and pose canvas
         overlay.style.display = 'flex';
         overlay.style.justifyContent = 'center';
         overlay.style.alignItems = 'center';
+        overlay.style.flexDirection = 'column';
         
         // Add loading text
         const loadingText = document.createElement('div');
+        loadingText.id = 'webcam-overlay-text';
         loadingText.textContent = 'Initializing camera...';
         loadingText.style.color = 'white';
         loadingText.style.fontFamily = 'Arial, sans-serif';
-        loadingText.style.fontSize = '16px';
+        loadingText.style.fontSize = '18px';
+        loadingText.style.marginBottom = '10px';
         
         overlay.appendChild(loadingText);
         document.getElementById('webcam-container').appendChild(overlay);

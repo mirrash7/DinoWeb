@@ -164,4 +164,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Call on load and window resize
     resizeGameCanvas();
     window.addEventListener('resize', resizeGameCanvas);
+
+    // Adjust webcam container size
+    const adjustWebcamSize = () => {
+        const gameContainer = document.querySelector('.game-container');
+        const gameSection = document.querySelector('.game-section');
+        const webcamContainer = document.getElementById('webcam-container');
+        
+        // Make container use flex layout and take full height
+        gameContainer.style.display = 'flex';
+        gameContainer.style.width = '100%';
+        gameContainer.style.height = 'calc(100vh - 50px)'; // Full height minus header
+        gameContainer.style.margin = '0 auto';
+        gameContainer.style.padding = '0 10px 10px 10px';
+        gameContainer.style.boxSizing = 'border-box';
+        
+        // Check if we're in landscape or portrait mode
+        if (window.innerWidth > window.innerHeight) {
+            // Landscape orientation - horizontal layout with 2:1 ratio
+            gameContainer.style.flexDirection = 'row';
+            gameContainer.style.gap = '20px';
+            
+            gameSection.style.flex = '2';  // 2/3 of the space
+            webcamContainer.style.flex = '1';  // 1/3 of the space
+        } else {
+            // Portrait orientation - stack vertically
+            gameContainer.style.flexDirection = 'column';
+            gameContainer.style.gap = '10px';
+            
+            gameSection.style.flex = '1';
+            gameSection.style.height = '50%';
+            webcamContainer.style.flex = '1';
+            webcamContainer.style.height = '50%';
+        }
+        
+        // Set heights to 100% to fill container
+        gameSection.style.height = '100%';
+        webcamContainer.style.height = '100%';
+        
+        // Make video and canvas fill container
+        const webcam = document.getElementById('webcam');
+        const poseCanvas = document.getElementById('pose-canvas');
+        
+        webcam.style.width = '100%';
+        webcam.style.height = '100%';
+        webcam.style.objectFit = 'cover';
+        
+        poseCanvas.style.width = '100%';
+        poseCanvas.style.height = '100%';
+        poseCanvas.style.position = 'absolute';
+        poseCanvas.style.top = '0';
+        poseCanvas.style.left = '0';
+        poseCanvas.style.zIndex = '2';
+        
+        // Also update the game canvas size
+        resizeGameCanvas();
+    };
+    
+    // Call immediately and on window resize
+    adjustWebcamSize();
+    window.addEventListener('resize', adjustWebcamSize);
 }); 
