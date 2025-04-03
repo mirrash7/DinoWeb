@@ -549,25 +549,45 @@ class DinoGame {
     }
     
     gameOver() {
-        // Existing game over code...
+        if (this.gameOver) return; // Already in game over state
         
-        // Check if this is a high score
-        if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
-            // Submit the score
-            window.highScoreManager.submitScore(
-                this.playerProfile.acronym,
-                this.playerProfile.country,
-                this.score
-            ).then(success => {
-                if (success) {
-                    console.log("Score submitted successfully!");
-                    
-                    // Update the leaderboard display if settings panel is open
-                    if (window.settingsPanel) {
-                        window.settingsPanel.updateLeaderboard();
+        this.gameOver = true;
+        this.isRunning = false;
+        
+        // Show game over message
+        this.drawGameOverScreen();
+        
+        // Check if this is a high score and player profile exists
+        if (window.highScoreManager && this.playerProfile && this.playerProfile.acronym) {
+            console.log("Checking if score qualifies for leaderboard:", this.score);
+            
+            if (window.highScoreManager.isHighScore(this.score)) {
+                console.log("New high score! Submitting to leaderboard");
+                
+                // Submit the score
+                window.highScoreManager.submitScore(
+                    this.playerProfile.acronym,
+                    this.playerProfile.country,
+                    this.score
+                ).then(success => {
+                    if (success) {
+                        console.log("Score submitted successfully!");
+                        
+                        // Update the leaderboard display if settings panel is open
+                        if (window.settingsPanel) {
+                            window.settingsPanel.updateLeaderboard();
+                        }
+                    } else {
+                        console.error("Failed to submit score");
                     }
-                }
-            });
+                }).catch(error => {
+                    console.error("Error submitting score:", error);
+                });
+            } else {
+                console.log("Score doesn't qualify for leaderboard");
+            }
+        } else {
+            console.warn("Cannot submit score: missing player profile or high score manager");
         }
     }
 }

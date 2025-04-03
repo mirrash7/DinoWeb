@@ -313,4 +313,20 @@ class UserProfileManager {
 document.addEventListener('DOMContentLoaded', () => {
     // Create the profile manager
     window.profileManager = new UserProfileManager();
-}); 
+});
+
+// Add this to ensure the profile is properly saved
+function saveProfile(profile) {
+    localStorage.setItem('dinoPlayerProfile', JSON.stringify(profile));
+    
+    // Make sure the profile is available globally
+    window.playerProfile = profile;
+    
+    // Dispatch event to notify other components
+    const event = new CustomEvent('profileComplete', { 
+        detail: profile 
+    });
+    document.dispatchEvent(event);
+    
+    console.log("Profile saved:", profile);
+} 

@@ -4,6 +4,7 @@ class HighScoreManager {
         const firebaseConfig = {
             apiKey: "AIzaSyCikYxp5FlVgfYU4eDRNUDiDNwWdpZtzfg",
             authDomain: "dino-web-7034b.firebaseapp.com",
+            databaseURL: "https://dino-web-7034b-default-rtdb.firebaseio.com",
             projectId: "dino-web-7034b",
             storageBucket: "dino-web-7034b.firebasestorage.app",
             messagingSenderId: "1027476024824",
