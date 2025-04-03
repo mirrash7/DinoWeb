@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Error initializing settings panel:", error);
     }
     
+    // Initialize high score manager
+    window.highScoreManager = new HighScoreManager();
+    
     // Wait for profile completion
     document.addEventListener('profileComplete', async (event) => {
         // Store profile data in game

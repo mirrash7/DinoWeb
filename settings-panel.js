@@ -210,55 +210,18 @@ class SettingsPanel {
     
     createLeaderboardTab() {
         const leaderboardContent = document.createElement('div');
-        leaderboardContent.className = 'tab-content';
-        leaderboardContent.id = 'leaderboard-tab';
+        leaderboardContent.className = 'leaderboard-content';
         
-        const table = document.createElement('table');
-        table.className = 'leaderboard-table';
+        // Add loading message
+        leaderboardContent.innerHTML = '<p>Loading high scores...</p>';
         
-        // Create table header
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        
-        ['Rank', 'Player', 'Country', 'Score'].forEach(headerText => {
-            const th = document.createElement('th');
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
-        
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-        
-        // Create table body
-        const tbody = document.createElement('tbody');
-        
-        this.leaderboard.forEach(entry => {
-            const row = document.createElement('tr');
-            
-            const rankCell = document.createElement('td');
-            rankCell.textContent = entry.rank;
-            
-            const nameCell = document.createElement('td');
-            nameCell.textContent = entry.name;
-            
-            const countryCell = document.createElement('td');
-            countryCell.textContent = this.getCountryFlag(entry.country) + ' ' + entry.country;
-            
-            const scoreCell = document.createElement('td');
-            scoreCell.textContent = entry.score;
-            
-            row.appendChild(rankCell);
-            row.appendChild(nameCell);
-            row.appendChild(countryCell);
-            row.appendChild(scoreCell);
-            
-            tbody.appendChild(row);
-        });
-        
-        table.appendChild(tbody);
-        leaderboardContent.appendChild(table);
-        
+        // Add to tab content
         this.content.appendChild(leaderboardContent);
+        
+        // Update leaderboard if high score manager exists
+        if (window.highScoreManager) {
+            this.updateLeaderboard();
+        }
     }
     
     createStatsTab() {
@@ -465,6 +428,14 @@ class SettingsPanel {
             this.game.isPaused = true;
         }
         console.log("Settings panel forced to show");
+    }
+    
+    updateLeaderboard() {
+        if (window.highScoreManager) {
+            window.highScoreManager.loadTopScores().then(() => {
+                window.highScoreManager.updateLeaderboardDisplay();
+            });
+        }
     }
 }
 

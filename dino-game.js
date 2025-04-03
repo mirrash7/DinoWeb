@@ -547,6 +547,29 @@ class DinoGame {
             .map(char => String.fromCodePoint(char.charCodeAt(0) + 127397))
             .join('');
     }
+    
+    gameOver() {
+        // Existing game over code...
+        
+        // Check if this is a high score
+        if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
+            // Submit the score
+            window.highScoreManager.submitScore(
+                this.playerProfile.acronym,
+                this.playerProfile.country,
+                this.score
+            ).then(success => {
+                if (success) {
+                    console.log("Score submitted successfully!");
+                    
+                    // Update the leaderboard display if settings panel is open
+                    if (window.settingsPanel) {
+                        window.settingsPanel.updateLeaderboard();
+                    }
+                }
+            });
+        }
+    }
 }
 
 // Define game classes (Dino, Obstacle, Cloud, Ground)
