@@ -1,7 +1,20 @@
 class HighScoreManager {
     constructor() {
-        // Base URL for our API endpoints
-        this.apiBaseUrl = 'https://dinoweb-api.vercel.app/api'; // Replace with your actual API URL
+        // Initialize Firebase (you'll need to replace this with your own Firebase config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCikYxp5FlVgfYU4eDRNUDiDNwWdpZtzfg",
+            authDomain: "dino-web-7034b.firebaseapp.com",
+            projectId: "dino-web-7034b",
+            storageBucket: "dino-web-7034b.firebasestorage.app",
+            messagingSenderId: "1027476024824",
+            appId: "1:1027476024824:web:5c3cf4367bfd6215463a0d",
+            measurementId: "G-HTYP6DE5D7"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        this.db = firebase.database();
+        this.scoresRef = this.db.ref('scores');
         
         // Cache for top scores
         this.topScores = [];
@@ -19,22 +32,12 @@ class HighScoreManager {
             const timestamp = Date.now();
             
             // Create a new score entry
-            const response = await fetch(`${this.apiBaseUrl}/scores`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: playerName.substring(0, 3).toUpperCase(), // Limit to 3 chars
-                    country: country || 'XX',
-                    score: score,
-                    timestamp: timestamp
-                })
+            await this.scoresRef.push({
+                name: playerName.substring(0, 3).toUpperCase(), // Limit to 3 chars
+                country: country || 'XX',
+                score: score,
+                timestamp: timestamp
             });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to submit score: ${response.statusText}`);
-            }
             
             // Reload top scores after submission
             await this.loadTopScores();
@@ -48,16 +51,23 @@ class HighScoreManager {
     // Load top 10 scores
     async loadTopScores() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/scores`);
+            // Get top 10 scores ordered by score (descending)
+            const snapshot = await this.scoresRef
+                .orderByChild('score')
+                .limitToLast(10)
+                .once('value');
             
-            if (!response.ok) {
-                throw new Error(`Failed to load scores: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
+            // Convert to array and sort
+            const scores = [];
+            snapshot.forEach(childSnapshot => {
+                scores.push({
+                    id: childSnapshot.key,
+                    ...childSnapshot.val()
+                });
+            });
             
             // Sort by score (highest first)
-            this.topScores = data.sort((a, b) => b.score - a.score).slice(0, 10);
+            this.topScores = scores.sort((a, b) => b.score - a.score);
             
             return this.topScores;
         } catch (error) {
