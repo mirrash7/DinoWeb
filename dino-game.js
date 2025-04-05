@@ -557,38 +557,69 @@ class DinoGame {
         // Show game over message
         this.drawGameOverScreen();
         
-        // Check if this is a high score and player profile exists
-        if (window.highScoreManager && this.playerProfile && this.playerProfile.acronym) {
-            console.log("Checking if score qualifies for leaderboard:", this.score);
+        // Check if this is a high score
+        if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
+            console.log("New high score! Prompting for player info:", this.score);
             
-            if (window.highScoreManager.isHighScore(this.score)) {
-                console.log("New high score! Submitting to leaderboard");
-                
-                // Submit the score
-                window.highScoreManager.submitScore(
-                    this.playerProfile.acronym,
-                    this.playerProfile.country,
-                    this.score
-                ).then(success => {
-                    if (success) {
-                        console.log("Score submitted successfully!");
+            // Show high score prompt
+            if (window.profileManager) {
+                window.profileManager.showHighScorePrompt(this.score, (playerData) => {
+                    if (playerData) {
+                        console.log("Submitting score with player data:", playerData);
                         
-                        // Update the leaderboard display if settings panel is open
-                        if (window.settingsPanel) {
-                            window.settingsPanel.updateLeaderboard();
-                        }
+                        // Save the player data for future use
+                        this.playerProfile = playerData;
+                        
+                        // Submit the score
+                        window.highScoreManager.submitScore(
+                            playerData.acronym,
+                            playerData.country,
+                            this.score
+                        ).then(success => {
+                            if (success) {
+                                console.log("Score submitted successfully!");
+                                
+                                // Update the leaderboard display if settings panel is open
+                                if (window.settingsPanel) {
+                                    window.settingsPanel.updateLeaderboard();
+                                }
+                            } else {
+                                console.error("Failed to submit score");
+                            }
+                        }).catch(error => {
+                            console.error("Error submitting score:", error);
+                        });
                     } else {
-                        console.error("Failed to submit score");
+                        console.log("Player skipped high score submission");
                     }
-                }).catch(error => {
-                    console.error("Error submitting score:", error);
                 });
-            } else {
-                console.log("Score doesn't qualify for leaderboard");
             }
         } else {
-            console.warn("Cannot submit score: missing player profile or high score manager");
+            console.log("Score doesn't qualify for leaderboard");
         }
+    }
+    
+    drawHeader() {
+        this.ctx.save();
+        
+        // Draw difficulty level
+        this.ctx.font = '20px Arial';
+        this.ctx.fillStyle = this.colors.scoreText;
+        this.ctx.textAlign = 'left';
+        const difficultyNames = ['Easy', 'Medium', 'Hard'];
+        this.ctx.fillText(`Difficulty: ${difficultyNames[this.currentDifficulty]}`, 20, 30);
+        
+        // Draw score
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`Score: ${this.score}`, this.width - 20, 30);
+        
+        // Draw FPS counter if enabled
+        if (this.showFPS) {
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(`FPS: ${Math.round(this.frameRate)}`, 20, 60); // Move below difficulty
+        }
+        
+        this.ctx.restore();
     }
 }
 
