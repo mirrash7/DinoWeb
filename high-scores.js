@@ -149,4 +149,31 @@ class HighScoreManager {
             .map(char => String.fromCodePoint(char.charCodeAt(0) + 127397))
             .join('');
     }
+    
+    // Add this method to the HighScoreManager class
+    submitTestScore() {
+        const testScore = Math.floor(Math.random() * 500) + 100; // Random score between 100-600
+        const testName = "TST";
+        const testCountry = "XX";
+        
+        console.log(`Submitting test score: ${testScore}`);
+        
+        return this.submitScore(testName, testCountry, testScore)
+            .then(success => {
+                if (success) {
+                    console.log("Test score submitted successfully!");
+                    alert(`Test score of ${testScore} submitted successfully!`);
+                    return true;
+                } else {
+                    console.error("Failed to submit test score");
+                    alert("Failed to submit test score");
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error("Error submitting test score:", error);
+                alert(`Error submitting test score: ${error.message}`);
+                return false;
+            });
+    }
 } 

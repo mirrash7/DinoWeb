@@ -165,6 +165,39 @@ class SettingsPanel {
         settingsContent.appendChild(settingsList);
         settingsContent.appendChild(resetBtn);
         
+        // Add a test button at the bottom
+        const testSection = document.createElement('div');
+        testSection.style.marginTop = '30px';
+        testSection.style.borderTop = '1px solid #ddd';
+        testSection.style.paddingTop = '20px';
+        
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test Firebase Connection';
+        testButton.className = 'test-btn';
+        testButton.addEventListener('click', () => this.testFirebaseConnection());
+        
+        const testScoreButton = document.createElement('button');
+        testScoreButton.textContent = 'Submit Test Score';
+        testScoreButton.className = 'test-btn';
+        testScoreButton.style.marginLeft = '10px';
+        testScoreButton.addEventListener('click', () => {
+            if (window.highScoreManager) {
+                window.highScoreManager.submitTestScore()
+                    .then(success => {
+                        if (success) {
+                            // Update the leaderboard display
+                            this.updateLeaderboard();
+                        }
+                    });
+            } else {
+                alert("Error: High score manager not initialized");
+            }
+        });
+        
+        testSection.appendChild(testButton);
+        testSection.appendChild(testScoreButton);
+        settingsContent.appendChild(testSection);
+        
         this.content.appendChild(settingsContent);
     }
     
@@ -436,6 +469,40 @@ class SettingsPanel {
                 window.highScoreManager.updateLeaderboardDisplay();
             });
         }
+    }
+    
+    testFirebaseConnection() {
+        console.log("Testing Firebase connection...");
+        
+        if (!window.highScoreManager) {
+            console.error("High score manager not initialized");
+            alert("Error: High score manager not initialized");
+            return;
+        }
+        
+        // Try to load scores
+        window.highScoreManager.loadTopScores()
+            .then(scores => {
+                console.log("Successfully loaded scores:", scores);
+                
+                // Display the scores in an alert for quick testing
+                if (scores.length === 0) {
+                    alert("Firebase connection successful, but no scores found. Try submitting a test score.");
+                } else {
+                    const scoreList = scores.map((s, i) => 
+                        `${i+1}. ${s.name} (${s.country}): ${s.score}`
+                    ).join('\n');
+                    
+                    alert(`Firebase connection successful!\n\nTop Scores:\n${scoreList}`);
+                }
+                
+                // Update the leaderboard display
+                this.updateLeaderboard();
+            })
+            .catch(error => {
+                console.error("Error testing Firebase:", error);
+                alert(`Firebase connection error: ${error.message}`);
+            });
     }
 }
 

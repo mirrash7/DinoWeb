@@ -269,5 +269,20 @@ input:checked + .slider:before {
 #settings-toggle:hover {
     background-color: #e8f5e9;
     transform: scale(1.05);
+}
+
+/* Add this at the end of the file */
+.test-btn {
+    padding: 8px 15px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.test-btn:hover {
+    background-color: #0b7dda;
 } 
 
