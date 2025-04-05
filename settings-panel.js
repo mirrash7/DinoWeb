@@ -29,7 +29,8 @@ class SettingsPanel {
             soundEnabled: true,
             showFPS: false,
             reducedMotion: false,
-            highContrast: true
+            highContrast: true,
+            fullOpacityWebcam: false
         };
         
         this.createPanel();
@@ -127,20 +128,20 @@ class SettingsPanel {
             this.settings.soundEnabled
         );
         
+        // Hide webcam toggle
+        const webcamOpacitySetting = this.createToggleSetting(
+            'Hide Webcam', 
+            'Hide webcam feed for privacy (only show pose detection)', 
+            'fullOpacityWebcam',
+            this.settings.fullOpacityWebcam
+        );
+        
         // FPS display toggle
         const fpsSetting = this.createToggleSetting(
             'Show FPS', 
             'Display frames per second counter', 
             'showFPS',
             this.settings.showFPS
-        );
-        
-        // Reduced motion toggle
-        const motionSetting = this.createToggleSetting(
-            'Reduced Motion', 
-            'Decrease visual effects for accessibility', 
-            'reducedMotion',
-            this.settings.reducedMotion
         );
         
         // High contrast toggle
@@ -151,10 +152,20 @@ class SettingsPanel {
             this.settings.highContrast
         );
         
+        // Reduced motion toggle
+        const motionSetting = this.createToggleSetting(
+            'Reduced Motion', 
+            'Decrease visual effects for accessibility', 
+            'reducedMotion',
+            this.settings.reducedMotion
+        );
+        
+        // Add settings in the specified order
         settingsList.appendChild(soundSetting);
+        settingsList.appendChild(webcamOpacitySetting);
         settingsList.appendChild(fpsSetting);
-        settingsList.appendChild(motionSetting);
         settingsList.appendChild(contrastSetting);
+        settingsList.appendChild(motionSetting);
         
         // Reset button
         const resetBtn = document.createElement('button');
@@ -362,12 +373,13 @@ class SettingsPanel {
     }
     
     resetSettings() {
-        // Reset to defaults - high contrast is now true by default
+        // Reset to defaults
         this.settings = {
             soundEnabled: true,
             showFPS: false,
             reducedMotion: false,
-            highContrast: true
+            highContrast: true,
+            fullOpacityWebcam: false
         };
         
         // Update UI
@@ -419,6 +431,12 @@ class SettingsPanel {
                     gameOverGlow: 'rgba(255, 215, 0, 0.7)'
                 };
             }
+        }
+        
+        // Apply webcam opacity setting
+        const webcam = document.getElementById('webcam');
+        if (webcam) {
+            webcam.style.opacity = this.settings.fullOpacityWebcam ? '0' : '0.7';
         }
         
         // Save settings to localStorage

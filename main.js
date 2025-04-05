@@ -227,4 +227,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Call immediately and on window resize
     adjustWebcamSize();
     window.addEventListener('resize', adjustWebcamSize);
+
+    // Apply webcam opacity from settings if available
+    const savedSettings = localStorage.getItem('dinoGameSettings');
+    if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        const webcam = document.getElementById('webcam');
+        if (webcam && settings.hasOwnProperty('fullOpacityWebcam')) {
+            webcam.style.opacity = settings.fullOpacityWebcam ? '0' : '0.7';
+        } else {
+            // Default opacity if setting doesn't exist
+            webcam.style.opacity = '0.7';
+        }
+    } else {
+        // Default opacity if no settings
+        const webcam = document.getElementById('webcam');
+        if (webcam) {
+            webcam.style.opacity = '0.7';
+        }
+    }
 }); 
