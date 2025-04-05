@@ -251,10 +251,12 @@ class SettingsPanel {
         // Add to tab content
         this.content.appendChild(leaderboardContent);
         
-        // Update leaderboard if high score manager exists
-        if (window.highScoreManager) {
-            this.updateLeaderboard();
-        }
+        // Update leaderboard immediately after creation
+        setTimeout(() => {
+            if (window.highScoreManager) {
+                this.updateLeaderboard();
+            }
+        }, 500); // Short delay to ensure Firebase is initialized
     }
     
     createStatsTab() {
@@ -315,36 +317,47 @@ class SettingsPanel {
     }
     
     switchTab(tabName) {
-        this.activeTab = tabName;
-        
-        // Update tab buttons
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => {
-            if (tab.dataset.tab === tabName) {
-                tab.classList.add('active');
-            } else {
-                tab.classList.remove('active');
+        // Update active tab button
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.tab === tabName) {
+                btn.classList.add('active');
             }
         });
         
-        // Update content visibility
-        const contents = document.querySelectorAll('.tab-content');
-        contents.forEach(content => {
-            if (content.id === `${tabName}-tab`) {
-                content.style.display = 'block';
-            } else {
-                content.style.display = 'none';
-            }
+        // Show selected tab content
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+            content.style.display = 'none';
         });
+        
+        // Special handling for leaderboard tab
+        if (tabName === 'leaderboard') {
+            document.querySelector('.leaderboard-content').style.display = 'block';
+            // Update leaderboard data when tab is selected
+            this.updateLeaderboard();
+        } else {
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+        }
     }
     
     toggle() {
         this.isVisible = !this.isVisible;
-        this.panel.style.display = this.isVisible ? 'flex' : 'none';
         
-        // Pause/resume game
-        if (this.game) {
-            this.game.isPaused = this.isVisible;
+        if (this.isVisible) {
+            this.panel.style.display = 'flex';
+            if (this.game) {
+                this.game.isPaused = true;
+            }
+            
+            // Load leaderboard data when panel is opened
+            this.updateLeaderboard();
+        } else {
+            this.panel.style.display = 'none';
+            if (this.game) {
+                this.game.isPaused = false;
+            }
         }
     }
     
