@@ -394,43 +394,4 @@ class HighScoreManager {
             }
         }
     }
-    
-    // Add this method to get the next reset time
-    getNextResetTime(leaderboardType) {
-        const now = new Date();
-        
-        // Convert to EST (rough approximation)
-        const nowEST = new Date(now);
-        nowEST.setHours(nowEST.getHours() - 5); // EST is UTC-5
-        
-        let nextReset;
-        
-        if (leaderboardType === 'daily') {
-            // Next reset is tomorrow at midnight EST
-            nextReset = new Date(nowEST);
-            nextReset.setDate(nextReset.getDate() + 1);
-            nextReset.setHours(0, 0, 0, 0);
-        } else if (leaderboardType === 'weekly') {
-            // Next reset is next Monday at midnight EST
-            nextReset = new Date(nowEST);
-            const daysUntilMonday = (1 + 7 - nowEST.getDay()) % 7;
-            nextReset.setDate(nextReset.getDate() + (daysUntilMonday || 7)); // If today is Monday, go to next Monday
-            nextReset.setHours(0, 0, 0, 0);
-        } else {
-            return 'Never';
-        }
-        
-        // Convert back from EST to local time
-        nextReset.setHours(nextReset.getHours() + 5); // Add back the 5 hours
-        
-        // Format the date
-        const options = { 
-            weekday: 'long', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        return nextReset.toLocaleDateString(undefined, options);
-    }
 } 

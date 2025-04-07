@@ -548,57 +548,6 @@ class DinoGame {
             .join('');
     }
     
-    gameOver() {
-        if (this.gameOver) return; // Already in game over state
-        
-        this.gameOver = true;
-        this.isRunning = false;
-        
-        // Show game over message
-        this.drawGameOverScreen();
-        
-        // Check if this is a high score
-        if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
-            console.log("New high score! Prompting for player info:", this.score);
-            
-            // Show high score prompt
-            if (window.profileManager) {
-                window.profileManager.showHighScorePrompt(this.score, (playerData) => {
-                    if (playerData) {
-                        console.log("Submitting score with player data:", playerData);
-                        
-                        // Save the player data for future use
-                        this.playerProfile = playerData;
-                        
-                        // Submit the score
-                        window.highScoreManager.submitScore(
-                            playerData.acronym,
-                            playerData.country,
-                            this.score
-                        ).then(success => {
-                            if (success) {
-                                console.log("Score submitted successfully!");
-                                
-                                // Update the leaderboard display if settings panel is open
-                                if (window.settingsPanel) {
-                                    window.settingsPanel.updateLeaderboard();
-                                }
-                            } else {
-                                console.error("Failed to submit score");
-                            }
-                        }).catch(error => {
-                            console.error("Error submitting score:", error);
-                        });
-                    } else {
-                        console.log("Player skipped high score submission");
-                    }
-                });
-            }
-        } else {
-            console.log("Score doesn't qualify for leaderboard");
-        }
-    }
-    
     drawHeader() {
         this.ctx.save();
         

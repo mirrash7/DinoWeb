@@ -128,7 +128,7 @@ h1 {
 
 @media (min-width: 1240px) {
     .container {
-        max-width: 1200px;
+        max-width: 100%;
         padding: 20px;
     }
     

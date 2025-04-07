@@ -23,18 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.game = game;
     
     // Initialize settings panel after game is created
-    try {
-        // Check if SettingsPanel class exists before trying to use it
-        if (typeof SettingsPanel === 'function') {
-            window.settingsPanel = new SettingsPanel(game);
-            console.log("Settings panel initialized successfully");
-        } else {
-            console.error("SettingsPanel class is not defined. Make sure settings.js is loaded before main.js");
-        }
-    } catch (error) {
-        console.error("Error initializing settings panel:", error);
-    }
-    
+    window.settingsPanel = new SettingsPanel(game);
+        
     // Initialize high score manager
     window.highScoreManager = new HighScoreManager();
     
