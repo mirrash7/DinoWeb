@@ -296,6 +296,51 @@ class DinoGame {
             // Check collision
             if (this.isColliding(this.dino, this.obstacles[i])) {
                 this.gameOver = true;
+                this.isRunning = false;
+
+                
+                // Check if this is a high score
+                if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
+                    console.log("HIGHSCORE");
+                    
+                    // Show high score prompt
+                    if (window.profileManager) {
+                        window.profileManager.showHighScorePrompt(this.score, (playerData) => {
+                            if (playerData) {
+                                console.log("Submitting score with player data:", playerData);
+                                
+                                // Save the player data for future use
+                                this.playerProfile = playerData;
+                                
+                                // Submit the score
+                                window.highScoreManager.submitScore(
+                                    playerData.acronym,
+                                    playerData.country,
+                                    this.score
+                                ).then(success => {
+                                    if (success) {
+                                        console.log("Score submitted successfully!");
+                                        
+                                        // Update the leaderboard display if settings panel is open
+                                        if (window.settingsPanel) {
+                                            window.settingsPanel.updateLeaderboard();
+                                        }
+                                    } else {
+                                        console.error("Failed to submit score");
+                                    }
+                                }).catch(error => {
+                                    console.error("Error submitting score:", error);
+                                });
+                            } else {
+                                console.log("Player skipped high score submission");
+                            }
+                        });
+                    }
+                } else {
+                    console.log("Score doesn't qualify for leaderboard");
+                }
+                
+                return;
             }
             
             if (this.obstacles[i].x < -100) {
