@@ -4,8 +4,9 @@ class UserProfileManager {
             difficulty: 1 // Default to Medium (0=Easy, 1=Medium, 2=Hard)
         };
         
-        // Country list with flag emojis (will be used in high score prompt)
+        // Expanded country list with flag emojis - fixed and complete
         this.countries = [
+            // Major countries first
             { code: 'US', name: '🇺🇸 United States' },
             { code: 'GB', name: '🇬🇧 United Kingdom' },
             { code: 'CA', name: '🇨🇦 Canada' },
@@ -21,11 +22,231 @@ class UserProfileManager {
             { code: 'ES', name: '🇪🇸 Spain' },
             { code: 'KR', name: '🇰🇷 South Korea' },
             { code: 'RU', name: '🇷🇺 Russia' },
-            { code: 'ZA', name: '🇿🇦 South Africa' },
-            { code: 'NG', name: '🇳🇬 Nigeria' },
+            
+            // All countries alphabetically
+            { code: 'AF', name: '🇦🇫 Afghanistan' },
+            { code: 'AL', name: '🇦🇱 Albania' },
+            { code: 'DZ', name: '🇩🇿 Algeria' },
+            { code: 'AD', name: '🇦🇩 Andorra' },
+            { code: 'AO', name: '🇦🇴 Angola' },
+            { code: 'AG', name: '🇦🇬 Antigua and Barbuda' },
             { code: 'AR', name: '🇦🇷 Argentina' },
+            { code: 'AM', name: '🇦🇲 Armenia' },
+            { code: 'AT', name: '🇦🇹 Austria' },
+            { code: 'AZ', name: '🇦🇿 Azerbaijan' },
+            { code: 'BS', name: '🇧🇸 Bahamas' },
+            { code: 'BH', name: '🇧🇭 Bahrain' },
+            { code: 'BD', name: '🇧🇩 Bangladesh' },
+            { code: 'BB', name: '🇧🇧 Barbados' },
+            { code: 'BY', name: '🇧🇾 Belarus' },
+            { code: 'BE', name: '🇧🇪 Belgium' },
+            { code: 'BZ', name: '🇧🇿 Belize' },
+            { code: 'BJ', name: '🇧🇯 Benin' },
+            { code: 'BT', name: '🇧🇹 Bhutan' },
+            { code: 'BO', name: '🇧🇴 Bolivia' },
+            { code: 'BA', name: '🇧🇦 Bosnia and Herzegovina' },
+            { code: 'BW', name: '🇧🇼 Botswana' },
+            { code: 'BN', name: '🇧🇳 Brunei' },
+            { code: 'BG', name: '🇧🇬 Bulgaria' },
+            { code: 'BF', name: '🇧🇫 Burkina Faso' },
+            { code: 'BI', name: '🇧🇮 Burundi' },
+            { code: 'KH', name: '🇰🇭 Cambodia' },
+            { code: 'CM', name: '🇨🇲 Cameroon' },
+            { code: 'CV', name: '🇨🇻 Cape Verde' },
+            { code: 'CF', name: '🇨🇫 Central African Republic' },
+            { code: 'TD', name: '🇹🇩 Chad' },
+            { code: 'CL', name: '🇨🇱 Chile' },
+            { code: 'CO', name: '🇨🇴 Colombia' },
+            { code: 'KM', name: '🇰🇲 Comoros' },
+            { code: 'CG', name: '🇨🇬 Congo' },
+            { code: 'CD', name: '🇨🇩 DR Congo' },
+            { code: 'CR', name: '🇨🇷 Costa Rica' },
+            { code: 'HR', name: '🇭🇷 Croatia' },
+            { code: 'CU', name: '🇨🇺 Cuba' },
+            { code: 'CY', name: '🇨🇾 Cyprus' },
+            { code: 'CZ', name: '🇨🇿 Czech Republic' },
+            { code: 'DK', name: '🇩🇰 Denmark' },
+            { code: 'DJ', name: '🇩🇯 Djibouti' },
+            { code: 'DM', name: '🇩🇲 Dominica' },
+            { code: 'DO', name: '🇩🇴 Dominican Republic' },
+            { code: 'EC', name: '🇪🇨 Ecuador' },
+            { code: 'EG', name: '🇪🇬 Egypt' },
+            { code: 'SV', name: '🇸🇻 El Salvador' },
+            { code: 'GQ', name: '🇬🇶 Equatorial Guinea' },
+            { code: 'ER', name: '🇪🇷 Eritrea' },
+            { code: 'EE', name: '🇪🇪 Estonia' },
+            { code: 'SZ', name: '🇸🇿 Eswatini' },
+            { code: 'ET', name: '🇪🇹 Ethiopia' },
+            { code: 'FJ', name: '🇫🇯 Fiji' },
+            { code: 'FI', name: '🇫🇮 Finland' },
+            { code: 'GA', name: '🇬🇦 Gabon' },
+            { code: 'GM', name: '🇬🇲 Gambia' },
+            { code: 'GE', name: '🇬🇪 Georgia' },
+            { code: 'GH', name: '🇬🇭 Ghana' },
+            { code: 'GR', name: '🇬🇷 Greece' },
+            { code: 'GD', name: '🇬🇩 Grenada' },
+            { code: 'GT', name: '🇬🇹 Guatemala' },
+            { code: 'GN', name: '🇬🇳 Guinea' },
+            { code: 'GW', name: '🇬🇼 Guinea-Bissau' },
+            { code: 'GY', name: '🇬🇾 Guyana' },
+            { code: 'HT', name: '🇭🇹 Haiti' },
+            { code: 'HN', name: '🇭🇳 Honduras' },
+            { code: 'HU', name: '🇭🇺 Hungary' },
+            { code: 'IS', name: '🇮🇸 Iceland' },
+            { code: 'ID', name: '🇮🇩 Indonesia' },
+            { code: 'IR', name: '🇮🇷 Iran' },
+            { code: 'IQ', name: '🇮🇶 Iraq' },
+            { code: 'IE', name: '🇮🇪 Ireland' },
+            { code: 'IL', name: '🇮🇱 Israel' },
+            { code: 'JM', name: '🇯🇲 Jamaica' },
+            { code: 'JO', name: '🇯🇴 Jordan' },
+            { code: 'KZ', name: '🇰🇿 Kazakhstan' },
+            { code: 'KE', name: '🇰🇪 Kenya' },
+            { code: 'KI', name: '🇰🇮 Kiribati' },
+            { code: 'KW', name: '🇰🇼 Kuwait' },
+            { code: 'KG', name: '🇰🇬 Kyrgyzstan' },
+            { code: 'LA', name: '🇱🇦 Laos' },
+            { code: 'LV', name: '🇱🇻 Latvia' },
+            { code: 'LB', name: '🇱🇧 Lebanon' },
+            { code: 'LS', name: '🇱🇸 Lesotho' },
+            { code: 'LR', name: '🇱🇷 Liberia' },
+            { code: 'LY', name: '🇱🇾 Libya' },
+            { code: 'LI', name: '🇱🇮 Liechtenstein' },
+            { code: 'LT', name: '🇱🇹 Lithuania' },
+            { code: 'LU', name: '🇱🇺 Luxembourg' },
+            { code: 'MG', name: '🇲🇬 Madagascar' },
+            { code: 'MW', name: '🇲🇼 Malawi' },
+            { code: 'MY', name: '🇲🇾 Malaysia' },
+            { code: 'MV', name: '🇲🇻 Maldives' },
+            { code: 'ML', name: '🇲🇱 Mali' },
+            { code: 'MT', name: '🇲🇹 Malta' },
+            { code: 'MH', name: '🇲🇭 Marshall Islands' },
+            { code: 'MR', name: '🇲🇷 Mauritania' },
+            { code: 'MU', name: '🇲🇺 Mauritius' },
+            { code: 'MD', name: '🇲🇩 Moldova' },
+            { code: 'MC', name: '🇲🇨 Monaco' },
+            { code: 'MN', name: '🇲🇳 Mongolia' },
+            { code: 'ME', name: '🇲🇪 Montenegro' },
+            { code: 'MA', name: '🇲🇦 Morocco' },
+            { code: 'MZ', name: '🇲🇿 Mozambique' },
+            { code: 'MM', name: '🇲🇲 Myanmar' },
+            { code: 'NA', name: '🇳🇦 Namibia' },
+            { code: 'NR', name: '🇳🇷 Nauru' },
+            { code: 'NP', name: '🇳🇵 Nepal' },
+            { code: 'NL', name: '🇳🇱 Netherlands' },
+            { code: 'NZ', name: '🇳🇿 New Zealand' },
+            { code: 'NI', name: '🇳🇮 Nicaragua' },
+            { code: 'NE', name: '🇳🇪 Niger' },
+            { code: 'NG', name: '🇳🇬 Nigeria' },
+            { code: 'KP', name: '🇰🇵 North Korea' },
+            { code: 'MK', name: '🇲🇰 North Macedonia' },
+            { code: 'NO', name: '🇳🇴 Norway' },
+            { code: 'OM', name: '🇴🇲 Oman' },
+            { code: 'PK', name: '🇵🇰 Pakistan' },
+            { code: 'PW', name: '🇵🇼 Palau' },
+            { code: 'PS', name: '🇵🇸 Palestine' },
+            { code: 'PA', name: '🇵🇦 Panama' },
+            { code: 'PG', name: '🇵🇬 Papua New Guinea' },
+            { code: 'PY', name: '🇵🇾 Paraguay' },
+            { code: 'PE', name: '🇵🇪 Peru' },
+            { code: 'PH', name: '🇵🇭 Philippines' },
+            { code: 'PL', name: '🇵🇱 Poland' },
+            { code: 'PT', name: '🇵🇹 Portugal' },
+            { code: 'QA', name: '🇶🇦 Qatar' },
+            { code: 'RO', name: '🇷🇴 Romania' },
+            { code: 'RW', name: '🇷🇼 Rwanda' },
+            { code: 'KN', name: '🇰🇳 Saint Kitts and Nevis' },
+            { code: 'LC', name: '🇱🇨 Saint Lucia' },
+            { code: 'VC', name: '🇻🇨 Saint Vincent and the Grenadines' },
+            { code: 'WS', name: '🇼🇸 Samoa' },
+            { code: 'SM', name: '🇸🇲 San Marino' },
+            { code: 'ST', name: '🇸🇹 São Tomé and Príncipe' },
+            { code: 'SA', name: '🇸🇦 Saudi Arabia' },
+            { code: 'SN', name: '🇸🇳 Senegal' },
+            { code: 'RS', name: '🇷🇸 Serbia' },
+            { code: 'SC', name: '🇸🇨 Seychelles' },
+            { code: 'SL', name: '🇸🇱 Sierra Leone' },
+            { code: 'SG', name: '🇸🇬 Singapore' },
+            { code: 'SK', name: '🇸🇰 Slovakia' },
+            { code: 'SI', name: '🇸🇮 Slovenia' },
+            { code: 'SB', name: '🇸🇧 Solomon Islands' },
+            { code: 'SO', name: '🇸🇴 Somalia' },
+            { code: 'ZA', name: '🇿🇦 South Africa' },
+            { code: 'SS', name: '🇸🇸 South Sudan' },
+            { code: 'LK', name: '🇱🇰 Sri Lanka' },
+            { code: 'SD', name: '🇸🇩 Sudan' },
+            { code: 'SR', name: '🇸🇷 Suriname' },
             { code: 'SE', name: '🇸🇪 Sweden' },
-            { code: 'NZ', name: '🇳🇿 New Zealand' }
+            { code: 'CH', name: '🇨🇭 Switzerland' },
+            { code: 'SY', name: '🇸🇾 Syria' },
+            { code: 'TW', name: '🇹🇼 Taiwan' },
+            { code: 'TJ', name: '🇹🇯 Tajikistan' },
+            { code: 'TZ', name: '🇹🇿 Tanzania' },
+            { code: 'TH', name: '🇹🇭 Thailand' },
+            { code: 'TL', name: '🇹🇱 Timor-Leste' },
+            { code: 'TG', name: '🇹🇬 Togo' },
+            { code: 'TO', name: '🇹🇴 Tonga' },
+            { code: 'TT', name: '🇹🇹 Trinidad and Tobago' },
+            { code: 'TN', name: '🇹🇳 Tunisia' },
+            { code: 'TR', name: '🇹🇷 Turkey' },
+            { code: 'TM', name: '🇹🇲 Turkmenistan' },
+            { code: 'TV', name: '🇹🇻 Tuvalu' },
+            { code: 'UG', name: '🇺🇬 Uganda' },
+            { code: 'UA', name: '🇺🇦 Ukraine' },
+            { code: 'AE', name: '🇦🇪 United Arab Emirates' },
+            { code: 'UY', name: '🇺🇾 Uruguay' },
+            { code: 'UZ', name: '🇺🇿 Uzbekistan' },
+            { code: 'VU', name: '🇻🇺 Vanuatu' },
+            { code: 'VA', name: '🇻🇦 Vatican City' },
+            { code: 'VE', name: '🇻🇪 Venezuela' },
+            { code: 'VN', name: '🇻🇳 Vietnam' },
+            { code: 'YE', name: '🇾🇪 Yemen' },
+            { code: 'ZM', name: '🇿🇲 Zambia' },
+            { code: 'ZW', name: '🇿🇼 Zimbabwe' },
+            
+            // Territories and dependencies
+            { code: 'PR', name: '🇵🇷 Puerto Rico' },
+            { code: 'GU', name: '🇬🇺 Guam' },
+            { code: 'AS', name: '🇦🇸 American Samoa' },
+            { code: 'VI', name: '🇻🇮 US Virgin Islands' },
+            { code: 'BM', name: '🇧🇲 Bermuda' },
+            { code: 'KY', name: '🇰🇾 Cayman Islands' },
+            { code: 'GI', name: '🇬🇮 Gibraltar' },
+            { code: 'FK', name: '🇫🇰 Falkland Islands' },
+            { code: 'PF', name: '🇵🇫 French Polynesia' },
+            { code: 'NC', name: '🇳🇨 New Caledonia' },
+            { code: 'GL', name: '🇬🇱 Greenland' },
+            { code: 'FO', name: '🇫🇴 Faroe Islands' },
+            { code: 'HK', name: '🇭🇰 Hong Kong' },
+            { code: 'MO', name: '🇲🇴 Macau' },
+            
+            // Other territories and regions
+            { code: 'XK', name: '🇽🇰 Kosovo' },
+            { code: 'EH', name: '🇪🇭 Western Sahara' },
+            { code: 'CK', name: '🇨🇰 Cook Islands' },
+            { code: 'NU', name: '🇳🇺 Niue' },
+            { code: 'MS', name: '🇲🇸 Montserrat' },
+            { code: 'AI', name: '🇦🇮 Anguilla' },
+            { code: 'AW', name: '🇦🇼 Aruba' },
+            { code: 'CW', name: '🇨🇼 Curaçao' },
+            { code: 'SX', name: '🇸🇽 Sint Maarten' },
+            { code: 'TC', name: '🇹🇨 Turks and Caicos Islands' },
+            { code: 'VG', name: '🇻🇬 British Virgin Islands' },
+            { code: 'GF', name: '🇬🇫 French Guiana' },
+            { code: 'GP', name: '🇬🇵 Guadeloupe' },
+            { code: 'MQ', name: '🇲🇶 Martinique' },
+            { code: 'RE', name: '🇷🇪 Réunion' },
+            { code: 'YT', name: '🇾🇹 Mayotte' },
+            { code: 'BL', name: '🇧🇱 Saint Barthélemy' },
+            { code: 'MF', name: '🇲🇫 Saint Martin' },
+            { code: 'PM', name: '🇵🇲 Saint Pierre and Miquelon' },
+            { code: 'WF', name: '🇼🇫 Wallis and Futuna' },
+            { code: 'GG', name: '🇬🇬 Guernsey' },
+            { code: 'JE', name: '🇯🇪 Jersey' },
+            { code: 'IM', name: '🇮🇲 Isle of Man' },
+            
+            // Add an option for "Other"
+            { code: 'XX', name: '🏳️ Other/Not Listed' }
         ];
         
         // Create and show the profile form
@@ -348,25 +569,48 @@ class UserProfileManager {
         
         // Set up validation
         const validateForm = () => {
-            const isValid = acronymInput.value.length === 3 && countrySelect.value !== '';
+            const acronymValue = acronymInput.value.toUpperCase();
+            const isValidLength = acronymValue.length === 3;
+            const isAllowed = !this.isProhibitedAcronym(acronymValue);
+            const hasCountry = countrySelect.value !== '';
+            
+            const isValid = isValidLength && isAllowed && hasCountry;
             saveButton.disabled = !isValid;
-            
-            // Visual feedback
-            if (acronymInput.value.length === 3) {
-                acronymInput.style.borderColor = '#4CAF50';
-            } else if (acronymInput.value.length > 0) {
-                acronymInput.style.borderColor = '#ff9800';
+        
+        // Visual feedback
+            if (!isValidLength) {
+                acronymInput.style.borderColor = acronymValue.length > 0 ? '#ff9800' : '#ccc';
+            } else if (!isAllowed) {
+                acronymInput.style.borderColor = '#ff0000'; // Red for prohibited terms
             } else {
-                acronymInput.style.borderColor = '#ccc';
-            }
+            acronymInput.style.borderColor = '#4CAF50';
+        }
+        
+        if (countrySelect.value !== '') {
+            countrySelect.style.borderColor = '#4CAF50';
+        } else {
+            countrySelect.style.borderColor = '#ccc';
+        }
             
-            if (countrySelect.value !== '') {
-                countrySelect.style.borderColor = '#4CAF50';
+            // Show error message for prohibited acronyms
+            if (!isAllowed && isValidLength) {
+                if (!document.getElementById('acronym-error')) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.id = 'acronym-error';
+                    errorMsg.textContent = 'This acronym is not allowed. Please choose another.';
+                    errorMsg.style.color = '#ff0000';
+                    errorMsg.style.fontSize = '12px';
+                    errorMsg.style.marginTop = '5px';
+                    acronymGroup.appendChild(errorMsg);
+                }
             } else {
-                countrySelect.style.borderColor = '#ccc';
-            }
-            
-            return isValid;
+                const errorMsg = document.getElementById('acronym-error');
+                if (errorMsg) {
+                    acronymGroup.removeChild(errorMsg);
+                }
+        }
+        
+        return isValid;
         };
         
         // Set up event listeners
@@ -409,13 +653,27 @@ class UserProfileManager {
             acronymInput.focus();
         }, 100);
     }
+    
+    isProhibitedAcronym(acronym) {
+        // List of prohibited 3-letter acronyms
+        const prohibitedList = [
+            // Offensive terms
+            'ASS', 'FAG', 'GAY', 'NIG', 'NGR', 'GER', 'CUM', 'JEW',
+            // Additional offensive terms
+            'KKK', 'KYS', 'DIE', 'FUK', 'FUC', 'FCK', 'SEX', 'XXX',
+            'POO', 'PEE', 'WTF', 'FML', 'STD', 'HIV', 'NAZ', 'KYS',
+            'KMS', 'SUK', 'SUC', 'VAG', 'DIK', 'DCK', 'COK', 'COC'
+        ];
+        
+        return prohibitedList.includes(acronym);
+    }
 }
 
 // Initialize the profile manager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Create the profile manager
     window.profileManager = new UserProfileManager();
-});
+}); 
 
 // Add this to ensure the profile is properly saved
 function saveProfile(profile) {

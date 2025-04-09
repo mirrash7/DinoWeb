@@ -120,6 +120,9 @@ class SettingsPanel {
         const settingsList = document.createElement('div');
         settingsList.className = 'settings-list';
         
+        // Difficulty setting (already the first option)
+        const difficultySetting = this.createDifficultySetting();
+        
         // Sound toggle
         const soundSetting = this.createToggleSetting(
             'Sound', 
@@ -161,6 +164,7 @@ class SettingsPanel {
         );
         
         // Add settings in the specified order
+        settingsList.appendChild(difficultySetting);
         settingsList.appendChild(soundSetting);
         settingsList.appendChild(webcamOpacitySetting);
         settingsList.appendChild(fpsSetting);
@@ -175,39 +179,6 @@ class SettingsPanel {
         
         settingsContent.appendChild(settingsList);
         settingsContent.appendChild(resetBtn);
-        
-        // Add a test button at the bottom
-        const testSection = document.createElement('div');
-        testSection.style.marginTop = '30px';
-        testSection.style.borderTop = '1px solid #ddd';
-        testSection.style.paddingTop = '20px';
-        
-        const testButton = document.createElement('button');
-        testButton.textContent = 'Test Firebase Connection';
-        testButton.className = 'test-btn';
-        testButton.addEventListener('click', () => this.testFirebaseConnection());
-        
-        const testScoreButton = document.createElement('button');
-        testScoreButton.textContent = 'Submit Test Score';
-        testScoreButton.className = 'test-btn';
-        testScoreButton.style.marginLeft = '10px';
-        testScoreButton.addEventListener('click', () => {
-            if (window.highScoreManager) {
-                window.highScoreManager.submitTestScore()
-                    .then(success => {
-                        if (success) {
-                            // Update the leaderboard display
-                            this.updateLeaderboard();
-                        }
-                    });
-            } else {
-                alert("Error: High score manager not initialized");
-            }
-        });
-        
-        testSection.appendChild(testButton);
-        testSection.appendChild(testScoreButton);
-        settingsContent.appendChild(testSection);
         
         this.content.appendChild(settingsContent);
     }
@@ -254,20 +225,103 @@ class SettingsPanel {
     
     createLeaderboardTab() {
         const leaderboardContent = document.createElement('div');
-        leaderboardContent.className = 'leaderboard-content';
+        leaderboardContent.className = 'tab-content leaderboard-content';
+        leaderboardContent.id = 'leaderboard-tab';
         
-        // Add loading message
-        leaderboardContent.innerHTML = '<p>Loading high scores...</p>';
+        // Create leaderboard container
+        const leaderboardContainer = document.createElement('div');
+        leaderboardContainer.className = 'leaderboard-container';
         
-        // Add to tab content
+        // Create tabs for different leaderboard types
+        const tabsContainer = document.createElement('div');
+        tabsContainer.className = 'leaderboard-tabs';
+        
+        const tabs = [
+            { id: 'allTime', label: 'All Time' },
+            { id: 'daily', label: 'Daily' },
+            { id: 'weekly', label: 'Weekly' }
+        ];
+        
+        tabs.forEach(tab => {
+            const tabButton = document.createElement('button');
+            tabButton.className = 'leaderboard-tab-btn';
+            if (tab.id === 'allTime') {
+                tabButton.classList.add('active');
+            }
+            tabButton.textContent = tab.label;
+            tabButton.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.leaderboard-tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                tabButton.classList.add('active');
+                
+                // Switch leaderboard type
+                if (window.highScoreManager) {
+                    window.highScoreManager.setLeaderboardType(tab.id);
+                    window.highScoreManager.updateLeaderboardTable();
+                }
+            });
+            
+            tabsContainer.appendChild(tabButton);
+        });
+        
+        // Create table container
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'leaderboard-table-container';
+        
+        // Add Firebase test buttons at the bottom of the leaderboard tab
+        const testSection = document.createElement('div');
+        testSection.className = 'leaderboard-test-section';
+        testSection.style.marginTop = '20px';
+        testSection.style.borderTop = '1px solid #ddd';
+        testSection.style.paddingTop = '15px';
+        
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test Firebase Connection';
+        testButton.className = 'test-btn';
+        testButton.addEventListener('click', () => this.testFirebaseConnection());
+        
+        const testScoreButton = document.createElement('button');
+        testScoreButton.textContent = 'Submit Test Score';
+        testScoreButton.className = 'test-btn';
+        testScoreButton.style.marginLeft = '10px';
+        testScoreButton.addEventListener('click', () => {
+            if (window.highScoreManager) {
+                window.highScoreManager.submitTestScore()
+                    .then(success => {
+                        if (success) {
+                            // Update the leaderboard display
+                            this.updateLeaderboard();
+                        }
+                    });
+            } else {
+                alert("Error: High score manager not initialized");
+            }
+        });
+        
+        const refreshButton = document.createElement('button');
+        refreshButton.textContent = '🔄 Refresh Scores';
+        refreshButton.className = 'test-btn';
+        refreshButton.style.marginLeft = '10px';
+        refreshButton.addEventListener('click', () => this.updateLeaderboard());
+        
+        testSection.appendChild(testButton);
+        testSection.appendChild(testScoreButton);
+        testSection.appendChild(refreshButton);
+        
+        // Assemble leaderboard
+        leaderboardContainer.appendChild(tabsContainer);
+        leaderboardContainer.appendChild(tableContainer);
+        leaderboardContainer.appendChild(testSection);
+        
+        leaderboardContent.appendChild(leaderboardContainer);
         this.content.appendChild(leaderboardContent);
         
-        // Update leaderboard immediately after creation
-        setTimeout(() => {
-            if (window.highScoreManager) {
-                this.updateLeaderboard();
-            }
-        }, 500); // Short delay to ensure Firebase is initialized
+        // Initialize with high score manager if available
+        if (window.highScoreManager) {
+            window.highScoreManager.updateLeaderboardDisplay();
+        }
     }
     
     createStatsTab() {
@@ -534,6 +588,83 @@ class SettingsPanel {
                 console.error("Error testing Firebase:", error);
                 alert(`Firebase connection error: ${error.message}`);
             });
+    }
+    
+    // Add this new method to create the difficulty setting
+    createDifficultySetting() {
+        const setting = document.createElement('div');
+        setting.className = 'setting-item';
+        
+        const info = document.createElement('div');
+        info.className = 'setting-info';
+        
+        const title = document.createElement('h3');
+        title.textContent = 'Difficulty';
+        
+        const description = document.createElement('p');
+        description.textContent = 'Change game difficulty';
+        description.className = 'setting-description';
+        
+        info.appendChild(title);
+        info.appendChild(description);
+        
+        const control = document.createElement('div');
+        control.className = 'setting-control difficulty-control';
+        
+        // Create radio buttons for each difficulty level
+        const difficulties = ['Easy', 'Medium', 'Hard'];
+        const difficultyContainer = document.createElement('div');
+        difficultyContainer.className = 'difficulty-buttons';
+        difficultyContainer.style.display = 'flex';
+        difficultyContainer.style.gap = '10px';
+        
+        difficulties.forEach((diff, index) => {
+            const label = document.createElement('label');
+            label.className = 'difficulty-label';
+            label.style.display = 'flex';
+            label.style.alignItems = 'center';
+            label.style.cursor = 'pointer';
+            label.style.padding = '5px 10px';
+            label.style.borderRadius = '4px';
+            label.style.backgroundColor = this.game.currentDifficulty === index ? '#4CAF50' : '#e0e0e0';
+            label.style.color = this.game.currentDifficulty === index ? 'white' : '#333';
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'difficulty';
+            radio.value = index;
+            radio.checked = this.game.currentDifficulty === index;
+            radio.style.marginRight = '5px';
+            radio.style.display = 'none'; // Hide the actual radio button
+            
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    // Update game difficulty
+                    this.game.currentDifficulty = index;
+                    
+                    // Update visual appearance of all labels
+                    const labels = difficultyContainer.querySelectorAll('.difficulty-label');
+                    labels.forEach((lbl, i) => {
+                        lbl.style.backgroundColor = i === index ? '#4CAF50' : '#e0e0e0';
+                        lbl.style.color = i === index ? 'white' : '#333';
+                    });
+                }
+            });
+            
+            const text = document.createElement('span');
+            text.textContent = diff;
+            
+            label.appendChild(radio);
+            label.appendChild(text);
+            difficultyContainer.appendChild(label);
+        });
+        
+        control.appendChild(difficultyContainer);
+        
+        setting.appendChild(info);
+        setting.appendChild(control);
+        
+        return setting;
     }
 }
 
