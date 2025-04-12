@@ -397,17 +397,14 @@ class DinoGame {
         // Draw ground with a subtle gradient
         this.ground.draw();
         
-        // Draw score in top right corner
+        // Draw score in top left corner
         this.ctx.font = 'bold 24px Arial';
         this.ctx.fillStyle = 'black';
-        this.ctx.textAlign = 'right';
-        this.ctx.fillText(`Score: ${this.score}`, this.width - 60, 40);
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`Score: ${this.score}`, 20, 40);
         
-        // Draw player profile in top left
         this.ctx.textAlign = 'left';
-        const countryFlag = this.getCountryFlag(this.playerProfile.country);
-        this.ctx.fillText(`${countryFlag} ${this.playerProfile.acronym}`, 20, 40);
-        this.ctx.textAlign = 'left';
+        
         
         // Draw obstacles with shadows
         this.obstacles.forEach(obstacle => {
