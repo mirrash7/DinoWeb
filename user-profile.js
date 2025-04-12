@@ -341,41 +341,28 @@ class UserProfileManager {
         difficultyGroup.appendChild(difficultyLabel);
         difficultyGroup.appendChild(difficultyButtons);
         
-        // Create submit button
-        const submitButton = document.createElement('button');
-        submitButton.type = 'submit';
-        submitButton.id = 'profile-submit';
-        submitButton.textContent = 'Start Game';
-        submitButton.style.padding = '12px';
-        submitButton.style.backgroundColor = '#4CAF50';
-        submitButton.style.color = 'white';
-        submitButton.style.border = 'none';
-        submitButton.style.borderRadius = '5px';
-        submitButton.style.fontSize = '16px';
-        submitButton.style.cursor = 'pointer';
-        submitButton.style.marginTop = '20px';
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
         
-        // Create loading indicator
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.id = 'profile-loading';
-        loadingIndicator.style.textAlign = 'center';
-        loadingIndicator.style.marginTop = '20px';
-        loadingIndicator.style.color = '#666';
+        // Create start button
+        const startButton = document.createElement('button');
+        startButton.className = 'start-button';
+        startButton.textContent = 'Start Game';
+        startButton.addEventListener('click', () => {
+            // ... existing start game code ...
+        });
         
-        const loadingText = document.createElement('p');
-        loadingText.textContent = 'Game is loading in the background...';
-        loadingText.style.margin = '5px 0';
-        
-        loadingIndicator.appendChild(loadingText);
+        // Add the start button to the container
+        buttonContainer.appendChild(startButton);
         
         // Assemble form
         form.appendChild(difficultyGroup);
-        form.appendChild(submitButton);
+        form.appendChild(buttonContainer);
         
         // Assemble form container
         formContainer.appendChild(title);
         formContainer.appendChild(form);
-        formContainer.appendChild(loadingIndicator);
         
         // Add to profile screen
         profileScreen.appendChild(formContainer);

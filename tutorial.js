@@ -19,12 +19,12 @@ class TutorialPanel {
             },
             {
                 title: "Jump Action",
-                text: "To make the dinosaur jump, quickly raise your arms up above your shoulders.",
+                text: "To make the dinosaur jump, jump with your shoulders above the yellow line.",
                 image: "tutorial/jump.png"
             },
             {
                 title: "Big Jump",
-                text: "For a higher jump, raise your arms all the way up over your head.",
+                text: "For a higher jump, jump with your shoulders above the red line.",
                 image: "tutorial/big-jump.png"
             },
             {
@@ -112,18 +112,34 @@ class TutorialPanel {
     }
     
     createToggleButton() {
-        const toggleBtn = document.createElement('button');
-        toggleBtn.id = 'tutorial-toggle';
-        toggleBtn.innerHTML = '❓';
-        toggleBtn.title = 'Tutorial';
-        toggleBtn.addEventListener('click', () => this.toggle());
+        // Create the tutorial button for the game screen
+        const gameToggleBtn = document.createElement('button');
+        gameToggleBtn.id = 'tutorial-toggle';
+        gameToggleBtn.textContent = 'Tutorial';
+        gameToggleBtn.title = 'How to Play';
+        gameToggleBtn.addEventListener('click', () => this.toggle());
         
         // Position it next to the settings button
         const settingsBtn = document.getElementById('settings-toggle');
         if (settingsBtn) {
-            settingsBtn.parentNode.insertBefore(toggleBtn, settingsBtn);
+            settingsBtn.parentNode.insertBefore(gameToggleBtn, settingsBtn);
         } else {
-            document.querySelector('.game-section').appendChild(toggleBtn);
+            document.querySelector('.game-section').appendChild(gameToggleBtn);
+        }
+        
+        // Create a tutorial button for the initial profile screen
+        const profileScreen = document.getElementById('profile-screen');
+        if (profileScreen) {
+            const startButton = profileScreen.querySelector('.start-button');
+            if (startButton) {
+                const profileTutorialBtn = document.createElement('button');
+                profileTutorialBtn.className = 'tutorial-button';
+                profileTutorialBtn.textContent = 'Tutorial';
+                profileTutorialBtn.addEventListener('click', () => this.toggle());
+                
+                // Insert before the start button
+                startButton.parentNode.insertBefore(profileTutorialBtn, startButton);
+            }
         }
     }
     
@@ -159,17 +175,24 @@ class TutorialPanel {
         const stepTitle = document.createElement('h3');
         stepTitle.textContent = step.title;
         
+        // Create image container
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'tutorial-image-container';
+        
         const stepImage = document.createElement('img');
         stepImage.src = step.image;
         stepImage.alt = step.title;
         stepImage.className = 'tutorial-image';
+        
+        // Add image to container
+        imageContainer.appendChild(stepImage);
         
         const stepText = document.createElement('p');
         stepText.textContent = step.text;
         
         // Add content to panel
         this.content.appendChild(stepTitle);
-        this.content.appendChild(stepImage);
+        this.content.appendChild(imageContainer);
         this.content.appendChild(stepText);
         
         // Update navigation buttons
