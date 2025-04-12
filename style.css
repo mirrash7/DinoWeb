@@ -166,4 +166,62 @@ h1 {
         flex: none;
         width: 100%;
     }
+}
+
+/* Add these styles to fix scrolling on mobile devices */
+@media (max-width: 768px) {
+    body, html {
+        overflow: auto; /* Allow scrolling on mobile */
+        height: auto;   /* Don't restrict height */
+        position: relative;
+    }
+    
+    .container {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .game-container {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 60px);
+    }
+    
+    .game-section, #webcam-container {
+        height: 50vh; /* Each takes half the viewport height */
+        min-height: 300px;
+    }
+    
+    /* Make sure the settings panel is scrollable */
+    .settings-panel {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    /* Make the country dropdown scrollable in the high score prompt */
+    select {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+}
+
+/* Add this to ensure the leaderboard is scrollable */
+.leaderboard-table-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Make sure the settings content is scrollable */
+.settings-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure the high score prompt is scrollable if needed */
+.high-score-prompt {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 } 
