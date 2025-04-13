@@ -32,16 +32,6 @@ class TutorialPanel {
                 text: "To make the dinosaur duck, crouch down or bend your knees.",
                 image: "tutorial/duck.png"
             },
-            {
-                title: "Keyboard Controls",
-                text: "You can also use the keyboard: Space to jump, Down arrow to duck.",
-                image: "tutorial/keyboard.png"
-            },
-            {
-                title: "Game Objective",
-                text: "Avoid obstacles by jumping or ducking. Your score increases the longer you survive!",
-                image: "tutorial/gameplay.png"
-            }
         ];
         
         this.createPanel();
