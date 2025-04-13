@@ -3,8 +3,8 @@ body, html {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     font-family: Arial, sans-serif;
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
 }
 
 .container {
@@ -168,11 +168,11 @@ h1 {
     }
 }
 
-/* Add these styles to fix scrolling on mobile devices */
-@media (max-width: 768px) {
+/* Add these styles for touch devices */
+@media (pointer: coarse) {
     body, html {
-        overflow: auto; /* Allow scrolling on mobile */
-        height: auto;   /* Don't restrict height */
+        overflow-y: auto; /* Allow vertical scrolling */
+        height: auto; /* Don't restrict height */
         position: relative;
     }
     
@@ -182,27 +182,64 @@ h1 {
     }
     
     .game-container {
-        flex-direction: column;
         height: auto;
         min-height: calc(100vh - 60px);
     }
     
     .game-section, #webcam-container {
-        height: 50vh; /* Each takes half the viewport height */
+        position: relative;
+        overflow: visible;
+    }
+    
+    /* Make sure the canvas is responsive */
+    #game-canvas {
+        touch-action: manipulation; /* Improve touch responsiveness */
+    }
+    
+    /* Ensure the webcam container is properly sized */
+    #webcam-container {
+        height: 40vh;
+        min-height: 250px;
+    }
+    
+    /* Make sure the game section is properly sized */
+    .game-section {
+        height: 50vh;
         min-height: 300px;
     }
-    
-    /* Make sure the settings panel is scrollable */
-    .settings-panel {
-        max-height: 80vh;
-        overflow-y: auto;
+}
+
+/* Add specific styles for iPad */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+    .game-container {
+        flex-direction: column;
     }
     
-    /* Make the country dropdown scrollable in the high score prompt */
-    select {
-        max-height: 150px;
-        overflow-y: auto;
+    .game-section, #webcam-container {
+        width: 100%;
+        max-width: 100%;
     }
+    
+    .game-section {
+        height: 60vh;
+    }
+    
+    #webcam-container {
+        height: 35vh;
+    }
+    
+    /* Ensure buttons are large enough for touch */
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Ensure the tutorial and settings panels are scrollable */
+.tutorial-panel, .settings-panel {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Add this to ensure the leaderboard is scrollable */
