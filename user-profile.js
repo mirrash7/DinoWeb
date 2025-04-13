@@ -393,10 +393,9 @@ class UserProfileManager {
     }
     
     // Method to show high score prompt
-    showHighScorePrompt(score, callback) {
-        // Create high score prompt overlay
+    showHighScorePrompt(score, highScoreType, callback) {
+        // Create overlay
         const overlay = document.createElement('div');
-        overlay.className = 'high-score-overlay';
         overlay.style.position = 'fixed';
         overlay.style.top = '0';
         overlay.style.left = '0';
@@ -412,85 +411,85 @@ class UserProfileManager {
         const promptContainer = document.createElement('div');
         promptContainer.className = 'high-score-prompt';
         promptContainer.style.backgroundColor = 'white';
-        promptContainer.style.padding = '30px';
+        promptContainer.style.padding = '20px';
         promptContainer.style.borderRadius = '10px';
-        promptContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+        promptContainer.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
         promptContainer.style.width = '90%';
-        promptContainer.style.maxWidth = '500px';
-        promptContainer.style.textAlign = 'center';
+        promptContainer.style.maxWidth = '400px';
+        promptContainer.style.maxHeight = '90vh';
+        promptContainer.style.display = 'flex';
+        promptContainer.style.flexDirection = 'column';
         
-        // Create title
+        // Create title with achievement type
         const title = document.createElement('h2');
-        title.textContent = 'New High Score!';
+        title.textContent = `New ${highScoreType} High Score!`;
+        title.style.textAlign = 'center';
         title.style.color = '#4CAF50';
-        title.style.marginBottom = '10px';
+        title.style.margin = '0 0 10px 0';
+        title.style.fontSize = '22px';
         
         // Create score display
-        const scoreDisplay = document.createElement('p');
-        scoreDisplay.textContent = `Your score: ${score}`;
+        const scoreDisplay = document.createElement('div');
+        scoreDisplay.textContent = `Your Score: ${score}`;
+        scoreDisplay.style.textAlign = 'center';
         scoreDisplay.style.fontSize = '24px';
         scoreDisplay.style.fontWeight = 'bold';
-        scoreDisplay.style.marginBottom = '20px';
+        scoreDisplay.style.margin = '0 0 15px 0';
         
         // Create form
         const form = document.createElement('form');
         form.style.display = 'flex';
         form.style.flexDirection = 'column';
-        form.style.gap = '15px';
+        form.style.gap = '10px';
+        form.style.flex = '1';
+        form.addEventListener('submit', (e) => e.preventDefault());
         
-        // Create acronym input
+        // Create acronym group
         const acronymGroup = document.createElement('div');
-        acronymGroup.style.display = 'flex';
-        acronymGroup.style.flexDirection = 'column';
-        acronymGroup.style.alignItems = 'flex-start';
-        acronymGroup.style.gap = '5px';
+        acronymGroup.style.marginBottom = '10px';
         
         const acronymLabel = document.createElement('label');
-        acronymLabel.htmlFor = 'high-score-acronym';
-        acronymLabel.textContent = 'Enter your 3-letter acronym:';
+        acronymLabel.textContent = 'Your 3-letter name:';
+        acronymLabel.style.display = 'block';
+        acronymLabel.style.marginBottom = '5px';
         acronymLabel.style.fontWeight = 'bold';
         
         const acronymInput = document.createElement('input');
         acronymInput.type = 'text';
-        acronymInput.id = 'high-score-acronym';
         acronymInput.maxLength = 3;
-        acronymInput.placeholder = 'ABC';
-        acronymInput.style.padding = '10px';
-        acronymInput.style.fontSize = '16px';
-        acronymInput.style.borderRadius = '5px';
-        acronymInput.style.border = '1px solid #ccc';
         acronymInput.style.width = '100%';
+        acronymInput.style.padding = '8px';
+        acronymInput.style.fontSize = '16px';
+        acronymInput.style.borderRadius = '4px';
+        acronymInput.style.border = '1px solid #ccc';
+        acronymInput.style.boxSizing = 'border-box';
         
         acronymGroup.appendChild(acronymLabel);
         acronymGroup.appendChild(acronymInput);
         
-        // Create country select
+        // Create country group
         const countryGroup = document.createElement('div');
-        countryGroup.style.display = 'flex';
-        countryGroup.style.flexDirection = 'column';
-        countryGroup.style.alignItems = 'flex-start';
-        countryGroup.style.gap = '5px';
+        countryGroup.style.marginBottom = '10px';
         
         const countryLabel = document.createElement('label');
-        countryLabel.htmlFor = 'high-score-country';
-        countryLabel.textContent = 'Select your country:';
+        countryLabel.textContent = 'Your country:';
+        countryLabel.style.display = 'block';
+        countryLabel.style.marginBottom = '5px';
         countryLabel.style.fontWeight = 'bold';
         
         const countrySelect = document.createElement('select');
-        countrySelect.id = 'high-score-country';
-        countrySelect.style.padding = '10px';
-        countrySelect.style.fontSize = '16px';
-        countrySelect.style.borderRadius = '5px';
-        countrySelect.style.border = '1px solid #ccc';
         countrySelect.style.width = '100%';
+        countrySelect.style.padding = '8px';
+        countrySelect.style.fontSize = '16px';
+        countrySelect.style.borderRadius = '4px';
+        countrySelect.style.border = '1px solid #ccc';
+        countrySelect.style.boxSizing = 'border-box';
         
-        // Add placeholder option
-        const placeholderOption = document.createElement('option');
-        placeholderOption.value = '';
-        placeholderOption.textContent = '-- Select a country --';
-        placeholderOption.selected = true;
-        placeholderOption.disabled = true;
-        countrySelect.appendChild(placeholderOption);
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '-- Select Country --';
+        countrySelect.appendChild(emptyOption);
         
         // Add country options
         this.countries.forEach(country => {
@@ -503,17 +502,16 @@ class UserProfileManager {
         countryGroup.appendChild(countryLabel);
         countryGroup.appendChild(countrySelect);
         
-        // Create buttons
+        // Create button group
         const buttonGroup = document.createElement('div');
         buttonGroup.style.display = 'flex';
-        buttonGroup.style.justifyContent = 'space-between';
         buttonGroup.style.gap = '10px';
         buttonGroup.style.marginTop = '10px';
         
         const skipButton = document.createElement('button');
-        skipButton.type = 'button';
         skipButton.textContent = 'Skip';
-        skipButton.style.padding = '10px 20px';
+        skipButton.type = 'button';
+        skipButton.style.padding = '10px';
         skipButton.style.backgroundColor = '#f0f0f0';
         skipButton.style.color = '#333';
         skipButton.style.border = 'none';
@@ -523,9 +521,9 @@ class UserProfileManager {
         skipButton.style.flex = '1';
         
         const saveButton = document.createElement('button');
-        saveButton.type = 'submit';
         saveButton.textContent = 'Save Score';
-        saveButton.style.padding = '10px 20px';
+        saveButton.type = 'submit';
+        saveButton.style.padding = '10px';
         saveButton.style.backgroundColor = '#4CAF50';
         saveButton.style.color = 'white';
         saveButton.style.border = 'none';
@@ -616,6 +614,12 @@ class UserProfileManager {
         // Handle skip button
         skipButton.addEventListener('click', () => {
             document.body.removeChild(overlay);
+            
+            // Reset the game's flag
+            if (window.game) {
+                window.game.isHighScorePromptOpen = false;
+            }
+            
             if (callback) callback(null);
         });
         
@@ -631,6 +635,12 @@ class UserProfileManager {
                 };
                 
                 document.body.removeChild(overlay);
+                
+                // Reset the game's flag
+                if (window.game) {
+                    window.game.isHighScorePromptOpen = false;
+                }
+                
                 if (callback) callback(playerData);
             }
         });

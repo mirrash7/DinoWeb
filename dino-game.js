@@ -67,6 +67,9 @@ class DinoGame {
             country: '--'
         };
         
+        // Add a property to track if a high score prompt is open
+        this.isHighScorePromptOpen = false;
+        
         // Load assets
         this.loadAssets();
         
@@ -140,49 +143,54 @@ class DinoGame {
         }
         
         // Set up keyboard controls
-        this.setupControls();
+        this.setupEventListeners();
     }
     
-    setupControls() {
+    setupEventListeners() {
+        // Handle keyboard input
         document.addEventListener('keydown', (event) => {
-            if (event.code === 'Space' && !this.gameOver && this.dino.canJump) {
-                if (event.shiftKey) {
-                    this.dino.velY = this.dino.bigJumpVel;
-                    this.lastAction = "big jump";
-                } else {
-                    this.dino.velY = this.dino.jumpVel;
-                    this.lastAction = "small jump";
-                }
-                this.dino.isJumping = true;
-                this.dino.isDucking = false;
-                this.dino.canJump = false;
-            }
+            if (!this.isRunning) return;
             
-            if (event.code === 'ArrowDown' && !this.gameOver) {
-                this.dino.isDucking = true;
-                this.lastAction = "duck";
-            }
-            
-            if (event.code === 'KeyR' && this.gameOver) {
-                this.reset();
-            }
-            
-            if (event.code === 'KeyD' && this.gameOver) {
-                this.currentDifficulty = (this.currentDifficulty + 1) % 3;
-                document.getElementById('difficulty').textContent = 
-                    `Difficulty: ${['Easy', 'Medium', 'Hard'][this.currentDifficulty]}`;
+            switch (event.key) {
+                case ' ':
+                case 'ArrowUp':
+                    this.dino.jump();
+                    break;
+                case 'ArrowDown':
+                    this.dino.duck();
+                    break;
+                // Remove the 'r' key handler for restart
+                // Remove the 'd' key handler for debug mode
             }
         });
         
         document.addEventListener('keyup', (event) => {
-            if (event.code === 'ArrowDown') {
-                this.dino.isDucking = false;
-                this.lastAction = "standing";
+            if (!this.isRunning) return;
+            
+            if (event.key === 'ArrowDown') {
+                this.dino.stand();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.resize();
+        });
+        
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.isRunning = false;
             }
         });
     }
     
     reset() {
+        // Don't restart if a high score prompt is open
+        if (this.isHighScorePromptOpen) {
+            return;
+        }
+        
         // Reset game state
         this.gameOver = false;
         this.score = 0;
@@ -300,12 +308,31 @@ class DinoGame {
 
                 
                 // Check if this is a high score
-                if (window.highScoreManager && window.highScoreManager.isHighScore(this.score)) {
-                    console.log("HIGHSCORE");
+                if (window.highScoreManager) {
+                    // Check each leaderboard type in order of prestige
+                    const isAllTimeHighScore = window.highScoreManager.isHighScore(this.score, 'allTime');
+                    const isWeeklyHighScore = window.highScoreManager.isHighScore(this.score, 'weekly');
+                    const isDailyHighScore = window.highScoreManager.isHighScore(this.score, 'daily');
                     
-                    // Show high score prompt
-                    if (window.profileManager) {
-                        window.profileManager.showHighScorePrompt(this.score, (playerData) => {
+                    // Determine the highest achievement
+                    let highScoreType = null;
+                    if (isAllTimeHighScore) {
+                        highScoreType = 'All-Time';
+                    } else if (isWeeklyHighScore) {
+                        highScoreType = 'Weekly';
+                    } else if (isDailyHighScore) {
+                        highScoreType = 'Daily';
+                    }
+                    
+                    if (highScoreType) {
+                        // Set the flag before showing the prompt
+                        this.isHighScorePromptOpen = true;
+                        
+                        // Show high score prompt with the achievement type
+                        window.profileManager.showHighScorePrompt(this.score, highScoreType, (playerData) => {
+                            // Reset the flag when the prompt is closed
+                            this.isHighScorePromptOpen = false;
+                            
                             if (playerData) {
                                 console.log("Submitting score with player data:", playerData);
                                 
@@ -492,7 +519,7 @@ class DinoGame {
             
             // Draw "GAME OVER" text with 3D effect - centered
             this.ctx.textAlign = 'center';
-            this.ctx.font = 'bold 36px Arial';
+            this.ctx.font = 'bold 24px Arial';
             
             // Text shadow
             this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -508,19 +535,17 @@ class DinoGame {
             this.ctx.shadowColor = 'transparent';
             
             // Draw score with gold glow - centered
-            this.ctx.font = 'bold 24px Arial';
+            this.ctx.font = 'bold 36px Arial';
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.shadowColor = this.colors.gameOverGlow;
             this.ctx.shadowBlur = 10;
-            this.ctx.fillText(`Final Score: ${this.score}`, panelX + panelWidth/2, panelY + 90);
+            this.ctx.fillText(`Final Score: ${this.score}`, panelX + panelWidth/2, panelY + 110);
             this.ctx.shadowColor = 'transparent';
             
             // Draw restart instructions - centered
-            this.ctx.font = '18px Arial';
+            this.ctx.font = '23px Arial';
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            this.ctx.fillText('Press R to restart', panelX + panelWidth/2, panelY + 130);
-            this.ctx.fillText('Press D to cycle difficulty', panelX + panelWidth/2, panelY + 160);
-            this.ctx.fillText('Raise your hand above the red line to restart', panelX + panelWidth/2, panelY + 190);
+            this.ctx.fillText('Raise your hand above the red line to restart', panelX + panelWidth/2, panelY + 170);
             
             // Reset text alignment
             this.ctx.textAlign = 'left';
@@ -611,6 +636,23 @@ class DinoGame {
         }
         
         this.ctx.restore();
+    }
+    
+    // Update the handleKeyPress method if you have one
+    handleKeyPress(event) {
+        if (!this.isRunning) return;
+        
+        switch (event.key) {
+            case ' ':
+            case 'ArrowUp':
+                this.dino.jump();
+                break;
+            case 'ArrowDown':
+                this.dino.duck();
+                break;
+            // Remove the 'r' key handler for restart
+            // Remove the 'd' key handler for debug mode
+        }
     }
 }
 
