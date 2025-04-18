@@ -654,6 +654,21 @@ class DinoGame {
             // Remove the 'd' key handler for debug mode
         }
     }
+    
+    skipHighScorePrompt() {
+        if (this.isHighScorePromptOpen) {
+            // Find and close the high score prompt
+            const overlay = document.querySelector('.high-score-prompt')?.parentElement;
+            if (overlay && overlay.parentElement) {
+                overlay.parentElement.removeChild(overlay);
+            }
+            
+            // Reset the flag
+            this.isHighScorePromptOpen = false;
+            
+            console.log("High score prompt skipped via gesture");
+        }
+    }
 }
 
 // Define game classes (Dino, Obstacle, Cloud, Ground)

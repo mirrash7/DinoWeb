@@ -269,6 +269,19 @@ class PoseDetector {
         // Store the previous state before updating
         const previousState = this.humanState;
         
+        // Check for both hands raised to skip high score prompt
+        if (this.game && this.game.isHighScorePromptOpen) {
+            const bothHandsRaised = (leftWrist && rightWrist && 
+                                   leftWrist.y < this.shoulderBaseline - this.bigJumpThreshold && 
+                                   rightWrist.y < this.shoulderBaseline - this.bigJumpThreshold);
+            
+            if (bothHandsRaised) {
+                // Signal to skip the high score prompt
+                this.game.skipHighScorePrompt();
+                return "standing";
+            }
+        }
+        
         // Check for hand raise to restart game - ONLY if game is over
         if (this.game && this.game.gameOver) {
             const handRaised = (leftWrist && leftWrist.y < this.shoulderBaseline - this.bigJumpThreshold) || 
@@ -324,7 +337,7 @@ class PoseDetector {
         // We need to flip the coordinates for the keypoints since the video is flipped in CSS
         // but we don't want to flip the drawing itself
         
-        // Draw keypoints with special highlight for hands that can trigger restart
+        // Draw keypoints with special highlight for hands
         pose.keypoints.forEach(keypoint => {
             if (keypoint.score > 0.5) {
                 this.ctx.beginPath();
@@ -339,6 +352,14 @@ class PoseDetector {
                     // Make the point larger and red to indicate it can trigger restart
                     this.ctx.arc(flippedX, keypoint.y, 10, 0, 2 * Math.PI);
                     this.ctx.fillStyle = 'red';
+                } 
+                // Highlight wrists when high score prompt is open
+                else if (this.game && this.game.isHighScorePromptOpen && 
+                        (keypoint.name === 'left_wrist' || keypoint.name === 'right_wrist') && 
+                        keypoint.y < this.shoulderBaseline - this.bigJumpThreshold) {
+                    // Make the point larger and blue to indicate it can skip high score
+                    this.ctx.arc(flippedX, keypoint.y, 10, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = 'blue';
                 } else {
                     this.ctx.arc(flippedX, keypoint.y, 6, 0, 2 * Math.PI);
                     this.ctx.fillStyle = 'yellow';
@@ -464,6 +485,23 @@ class PoseDetector {
                 this.ctx.fillStyle = 'white';
                 this.ctx.fillText(restartText, x, 40);
             }
+        }
+
+        // Add skip high score instruction if high score prompt is open
+        if (this.game && this.game.isHighScorePromptOpen) {
+            this.ctx.font = '18px Arial';
+            
+            // Center the skip instruction
+            const skipText = 'Raise both hands above red line to skip';
+            const metrics = this.ctx.measureText(skipText);
+            const x = (this.poseCanvas.width - metrics.width) / 2;
+            
+            // Draw with more visible background
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            this.ctx.fillRect(x - 10, 20, metrics.width + 20, 30);
+            
+            this.ctx.fillStyle = 'white';
+            this.ctx.fillText(skipText, x, 40);
         }
     }
     

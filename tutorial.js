@@ -32,6 +32,11 @@ class TutorialPanel {
                 text: "To make the dinosaur duck, crouch down or bend your knees.",
                 image: "tutorial/duck.png"
             },
+            {
+                title: "Skip High Score Entry",
+                text: "If you achieve a high score but don't want to enter your details, raise both hands above the red line to skip the entry form.",
+                image: "tutorial/skip-highscore.png"
+            }
         ];
         
         this.createPanel();
