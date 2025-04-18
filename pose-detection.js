@@ -83,7 +83,7 @@ class PoseDetector {
             if (this.webcamOverlay) {
                 const overlayText = document.getElementById('webcam-overlay-text');
                 if (overlayText) {
-                    overlayText.textContent = 'Stand in front of the camera';
+                    overlayText.textContent = 'Press "Start Game" to begin';
                     overlayText.style.fontSize = '22px';
                     
                     // Add a secondary instruction

@@ -59,15 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const deltaTime = timestamp - lastTime;
         lastTime = timestamp;
         
-        // Skip frames if running too slow (below 30fps)
-        if (deltaTime > 33 && !game.gameOver) { // 33ms = ~30fps
-            // Skip cloud generation on slow frames
-            game.enableClouds = false;
-        } else {
-            // Only re-enable clouds if they weren't disabled by performance settings
-            if (!game.reducedEffects) {
-                game.enableClouds = true;
-            }
+        // Only re-enable clouds if they weren't disabled by performance settings
+        if (!game.reducedEffects) {
+            game.enableClouds = true;
         }
         
         // Update and draw
